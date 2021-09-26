@@ -16,12 +16,14 @@
 			<div :class="isLoading ? 'not-active' : ''">	
 				<draggable 
 				v-model="lists" 
+				delay-on-touch-only="true"
+				delay="100"
 				@start="drag=true" 
 				@end="drag=false;saveOrderList()" 
 				ghost-class="ghost"
 				item-key="id">
 					<transition-group>
-						<div class="list-item cursor-pointer flex-between" v-for="list in lists" :key="list.id" @click.prevent="showList(list.id, list.name);showLoader()">
+						<div class="list-item cursor-pointer flex-between" v-for="list in lists" :key="list.id" @click="showList(list.id, list.name);showLoader()">
 							<p>{{list.name}}</p>
 							<div>
 								<i class="fas fa-trash-alt trash" @click.prevent="trashclicked=true;trash(list.id, list.name, 'list')"></i>
@@ -48,9 +50,17 @@
 					<div></div><div></div><div></div><div></div>
 				</div>
 			</div>
+
+
+			<div class="list-item cursor-pointer flex-between" v-if="isLoading==false && todos==null">
+				<p>No Todos found, please create one!</p>
+			</div>
+
 			<div :class="isLoading ? 'not-active' : 'is-active'">
 				<draggable 
 				v-model="todos" 
+				delay-on-touch-only="true"
+				delay="100"
 				@start="drag=true" 
 				@end="drag=false;saveOrderTodo()" 
 				ghost-class="ghost"
@@ -167,7 +177,7 @@ export default {
 			listActive: false,
 			isLoading: true, 
 			lists:  [],
-			todos: [],
+			todos: null,
 			newListDescription: '',
 			newListName: '',
 			newTodoType:1,
@@ -228,7 +238,12 @@ export default {
 			v.currentlyDeletingId = "";
 			v.currentlyDeletingType = "";
 			v.showDeletePrompt=false;
-			v.getLists();
+			if(url == "todo") {
+				v.getTodos();
+			}else {
+				v.getLists();
+			}
+			
 
 
 		},
@@ -300,6 +315,7 @@ export default {
 		},
 		async getTodos(){
 			var v = this;
+			v.todos = [];
 			var fd = new FormData();
 			fd.append('id', localStorage.id);
 			fd.append('list_id', v.currentListId);

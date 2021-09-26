@@ -116,7 +116,7 @@ export default createStore({
             var fd = new FormData();
             fd.append('token', localStorage.token);
 
-            axios.post("http://192.168.1.6/api/server.php?action=verifytoken",fd).then(function(response){
+            axios.post("server.php?action=verifytoken",fd).then(function(response){
                 console.log('sending token to api')
                 if(response.data.error){
                     // console.log("token invalid");
