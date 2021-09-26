@@ -1,0 +1,59 @@
+.nav-container {
+	position:absolute;
+	width: 100%;
+	height: 0;
+	top:0;
+	left:0;
+	background-color: $background-color;
+	z-index: 20;
+	overflow: hidden;
+	transition: height .5s ease-in-out;
+
+	
+
+	.nav {
+		padding: 1em;
+		position: relative;
+		max-width: 500px;
+		margin-left:auto;
+		margin-right:auto;
+		background-color: $card-item-color;
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+		
+		a {
+			color: $medium-emphasis;
+			text-decoration: none;
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+		.closebtn {
+			text-align: center;
+			cursor: pointer;
+		}
+	}
+	&.active {
+		height:100%
+	}
+
+}
+
+.tab {
+	width:75px;
+	padding:.5em;
+	height:50px;
+	position:absolute;
+	left:50%;
+	transform:translateX(-50%);
+	background-color: $card-head-color;
+	text-align: center;
+	display: flex;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	cursor: pointer;
+
+	align-items: center;
+	justify-content: space-around;
+	z-index: 5;
+}
