@@ -1,9 +1,9 @@
 <template>
 <div class="container">
-	<div class="card" :class="[listActive ? 'not-active-left' : '',showNewListPrompt ? 'not-active-left' : '']">
+	<div class="card" :class="[listActive ? 'not-active-left' : '',showNewListPrompt ? 'not-active-left' : '',showEditListPrompt ? 'not-active-left' : '']">
 		<div class="card-head" >
 			<h1>Your Lists</h1>
-			<i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewListPrompt=true"></i>
+			<i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewListPrompt=true;currentPage='newList'"></i>
 		</div>
 		<div class="card-body">
 			<div :class="isLoading ? '' : 'not-active'">
@@ -23,10 +23,10 @@
 				ghost-class="ghost"
 				item-key="id">
 					<transition-group>
-						<div class="list-item cursor-pointer flex-between" v-for="list in lists" :key="list.id" @click="showList(list.id, list.name);showLoader()">
+						<div class="list-item cursor-pointer flex-between" v-for="list in lists" :key="list.id" @click="currentPage='todoList';showList(list.id, list.name, list.owner, list.description);showLoader()">
 							<p>{{list.name}}</p>
 							<div>
-								<i class="fas fa-trash-alt trash" @click.prevent="trashclicked=true;trash(list.id, list.name, 'list')"></i>
+								<i class="fas fa-trash-alt trash" @click.stop="trashclicked=true;trash(list.id, list.name, 'list');currentPage='deleteList'"></i>
 								<i class="back-button fas fa-chevron-circle-right"></i>
 							</div>
 						</div>
@@ -40,9 +40,16 @@
 	<div class="card"  :class="[listActive ? '' : 'not-active-right', showNewTodoPrompt ? 'not-active-left' : '']">
 		
 		<div class="card-head">
-			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false"></i>
-			<h2>{{this.currentList}}</h2>
-			<i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true"></i>
+			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false;currentPage='lists'"></i>
+			<div style="text-align:center;">
+				<h2>{{currentList}}</h2>
+				<p>{{currentListDescription}}</p>
+			</div>
+			<div>
+				<i class="edit-button far fa-edit fa-2x" @click="editCurrentList(currentListId);currentPage='editList'"></i>
+				<i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true;currentPage='newTodo'"></i>
+			</div>
+			
 		</div>
 		<div class="card-body">
 			<div :class="isLoading ? '' : 'not-active'">
@@ -52,8 +59,8 @@
 			</div>
 
 
-			<div class="list-item cursor-pointer flex-between" v-if="isLoading==false && todos==null">
-				<p>No Todos found, please create one!</p>
+			<div class="list-item cursor-pointer flex-between" v-if="isLoading==false && todos==null" @click="showNewTodoPrompt=true;currentPage='newTodo'">
+				<p >No items found, please create one!</p>
 			</div>
 
 			<div :class="isLoading ? 'not-active' : 'is-active'">
@@ -69,13 +76,14 @@
 						<div class="list-item cursor-pointer flex-between" v-for="todo in todos" :key="todo.id" @click="markDone(todo.id)" :class="todo.done==0 ? '' : 'done'">
 							<p>{{todo.name}}</p>
 							<div>
-								<i class="fas fa-trash-alt trash" v-if="todo.done==1" @click.prevent="trashclicked=true;trash(todo.id, todo.name, 'todo')"></i>
+								<i class="fas fa-trash-alt trash" @click.stop="trash(todo.id, todo.name, 'todo');currentPage='deleteTodo'"></i>
 								<i class="far fa-check-circle primary" v-if="todo.done==1"></i>
 								<i class="far fa-circle primary" v-else></i>
 							</div>
 						</div>
 					</transition-group>
 				</draggable>
+				<div v-if="showDeleteAll" class="list-item cursor-pointer" style="text-align:center; margin-top:1em" @click.prevent="showDeleteAllPrompt = true;currentPage='deleteAll' ">Delete all completed</div>
 				<!-- <div class="list-item" v-for="todo in todos" :key="todo.id">{{todo.name}}</div> -->
 			</div>
 			
@@ -86,7 +94,7 @@
 		
 		<div class="card-head">
 			<h2>Create New List</h2>
-			<i class="cancel-btn fas fa-times-circle fa-2x" @click="this.showNewListPrompt=false"></i>
+			<i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewListPrompt=false;currentPage='lists'"></i>
 		</div>
 		<div class="card-body">
 			<div>
@@ -109,15 +117,15 @@
 	<div class="card"  :class="showNewTodoPrompt ? '' : 'not-active-right'">
 		
 		<div class="card-head">
-			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="this.showNewTodoPrompt=false"></i>
+			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i>
 			<h2>New Todo</h2>
-			<i class="cancel-btn fas fa-times-circle fa-2x" @click="this.showNewTodoPrompt=false"></i>
+			<i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i>
 		</div>
 		<div class="card-body">
 			<div>
-				<form @submit.prevent="newTodo()">
+				<form @submit.prevent="newTodo();currentPage='todoList'">
 					<div class="input-group">
-						<input type="text" name="todo-name" v-model="newTodoName" placeholder="List Name" autocomplete="off" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'"/>
+						<input type="text" name="todo-name" v-model="newTodoName" placeholder="Todo Name" autocomplete="off" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'"/>
 					</div>
 					<div class="input-group">
 						<!-- <input type="text" v-model="newListDescription" name="description" placeholder="List Description(optional)" autocomplete="off" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'" /> -->
@@ -141,39 +149,132 @@
 		</div>
 	</div>
 
+	<div class="card"  :class="showEditListPrompt ? '' : 'not-active-right'">
+		
+		<div class="card-head">
+			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='lists'"></i>
+			<h2>Edit List</h2>
+			<i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewTodoPrompt=false;currentPage='lists'"></i>
+		</div>
+		<div class="card-body">
+			<div>
+				<form @submit.prevent="editList();currentPage='lists'">
+					<div class="input-group">
+						List Name: <input type="text" name="list-name" v-model="currentList" placeholder="List Name" autocomplete="off" />
+					</div>
+					<div class="input-group">
+						Description: <input type="text" v-model="currentListDescription" name="description" placeholder="List Description" autocomplete="off" />
+					</div>
+					<div class="input-group">
+						<input type="submit" name="submit" />
+					</div>
+				</form>
+			</div>			
+		</div>
+		<div class="card-body" >
+			<div v-if="listOwner">
+				Share with a friend:
+					<ul class="friends">
+						<li v-if="!friends">
+							You do not have any friends.
+						</li>
+						<li v-else v-for="friend in friends" :key="friend.id" class="friend-item" @click="shareList(friend.user_id)">
+							<i class="fas fa-external-link-alt"></i> {{friend.username}}
+						</li>
+					</ul>
+			</div>		
+			<div v-else>
+				You don't Own this list, but you can remove it from your list:
+
+				<ul class="friends">
+					<li @click="removeList()" class="cursor-pointer">
+						<i class="far fa-trash-alt"></i> Remove List
+					</li>
+				</ul>
+			</div>	
+		</div>
+		<div class="card-body">
+			Users with Access:
+			<ul class="friends">
+				<li v-if="!currentAccess">
+					No one has access but you.
+				</li>
+				<li v-else v-for="user in currentAccess" :key="user.id" class="friend-item">
+					<i class="fas fa-external-link-alt"></i> {{user.username}} - <span @click="removeList(user.id)">Remove</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+
 	
 </div>
 
 <div class="popup-container" :class="showDeletePrompt ? '' : 'hidden'">
+	<div class="popup-backdrop"></div>
 	<div class="popup card active">
 		<div class="card-head">
-			<h1>Warning! Please Confirm</h1>
+			<h3>Warning! Please Confirm</h3>
 		</div>
 		<div class="card-body">
 			<p>Are you sure you wish to delete "{{currentlyDeleting}}"</p>
 			<div class="flex-fill">
-				<div class="btn cancel" @click.prevent="this.showDeletePrompt=false"><i class="fas fa-times-circle"></i> Cancel</div>
-				<div class="btn confirm" @click.prevent="deleteItem()"><i class="fas fa-trash-alt"></i> Delete</div>
+
+				<div v-if="currentlyDeletingType == 'list'" class="btn cancel" @click.prevent="this.showDeletePrompt=false;currentPage='lists'"><i class="fas fa-times-circle"></i> Cancel</div>
+				<div v-else class="btn cancel" @click.prevent="this.showDeletePrompt=false;currentPage='todoList'"><i class="fas fa-times-circle"></i> Cancel</div>
+				<!-- STUPID navigation hack -->
+				<div v-if="currentlyDeletingType == 'list'" class="btn confirm" @click.prevent="deleteItem();currentPage='lists'"><i class="fas fa-trash-alt"></i> Delete</div>
+				<div v-else class="btn confirm" @click.prevent="deleteItem();currentPage='todoList'"><i class="fas fa-trash-alt"></i> Delete</div>
 			</div>
 			
 		</div>
 	</div>
 </div>
+
+<div class="popup-container" :class="showDeleteAllPrompt ? '' : 'hidden'">
+	<div class="popup-backdrop"></div>
+	<div class="popup card active">
+		<div class="card-head">
+			<h3>Warning! Please Confirm</h3>
+		</div>
+		<div class="card-body">
+			<p>Are you sure you wish to delete all completed items from "{{currentList}}"</p>
+			<div class="flex-fill">
+				<div class="btn cancel" @click.prevent="this.showDeleteAllPrompt=false;currentPage='todoList'"><i class="fas fa-times-circle"></i> Cancel</div>
+				<div class="btn confirm" @click.prevent="deleteCompleted(currentListId);currentPage='todoList'"><i class="fas fa-trash-alt"></i> Delete</div>
+			</div>
+			
+		</div>
+	</div>
+</div>
+
+
+
+<!-- <div class="bottom-nav">
+	{{this.currentPage}}
+	<div @click.prevent="back()"><i class="fas fa-backward"></i> Back</div>
+</div> -->
 </template>
 
 <script>
 import axios from 'axios';
 import { VueDraggableNext } from 'vue-draggable-next'
+import mitt from 'mitt'
+const emitter = mitt()
 export default {	
 	name: 'Lists',
 	data(){
 		return {
 			listName: '',
 			showNewListPrompt: false,
+			showEditListPrompt: false,
 			showNewTodoPrompt: false,
 			showDeletePrompt: false,
+			showDeleteAllPrompt: false,
 			currentList: "",
 			currentListId: -1,
+			currentListDescription: "",
+			currentListOwner: '',
 			listActive: false,
 			isLoading: true, 
 			lists:  [],
@@ -182,11 +283,14 @@ export default {
 			newListName: '',
 			newTodoType:1,
 			newTodoName: '',
-			trashclicked: false,
 			currentlyDeleting: '',
 			currentlyDeletingId: -1,
 			currentlyDeletingType: null,
 			stayOnPage: null,
+			currentPage: 'lists',
+			friends:null,
+			currentAccess:null,
+			timer: null,
 		}
 	},
 	components: {
@@ -197,16 +301,153 @@ export default {
 			console.log("test");
 
 		},
+		back(){
+			//weird nav issues
+			// fixes the back button for navigation inside the list page
+			// console.log("backbtn pressed")
+			// console.log("current page: "+this.currentPage)
+			if(this.currentPage == 'lists') {
+				console.log("current page: lists")
+			}
+			if(this.currentPage == 'todoList'){
+				this.listActive=false;
+				this.currentPage = "lists"
+			}
+			if(this.currentPage == 'newList'){
+				this.showNewListPrompt = false;
+				this.currentPage = "lists"
+			}
+			if(this.currentPage == 'newTodo'){
+				this.showNewTodoPrompt = false;
+				this.currentPage = "todoList"
+			}
+			if(this.currentPage == 'editList'){
+				this.currentPage = "todoList"
+				this.showEditListPrompt=false;
+				this.listActive=true;
+			}
+			if(this.currentPage == 'deleteAll') {
+				this.currentPage = "todoList";
+				this.showDeleteAllPrompt=false;
+			}
+			if(this.currentPage == 'deleteList') {
+				this.currentPage = "lists";
+				this.showDeletePrompt=false;
+			}
+			if(this.currentPage == 'deleteTodo') {
+				this.currentPage = "todoList";
+				this.showDeletePrompt=false;
+			}
+		},
 		trash(id, name, type){
 			var v = this;
 			v.showDeletePrompt = true;
 			v.currentlyDeleting = name;
 			v.currentlyDeletingId = id;
 			v.currentlyDeletingType = type;
-			setTimeout(function(){
-				v.trashclicked = false;
-			}, 50); // dumb ass hack to keep the trash button from triggering the mark done
+			// setTimeout(function(){
+			// 	v.trashclicked = false;
+			// }, 50); // dumb ass hack to keep the trash button from triggering the mark done
 
+		},
+		async deleteCompleted (id){
+			var v = this;
+			v.isLoading = true;
+			var fd = new FormData();
+			fd.append('id', localStorage.id);
+			fd.append('token', localStorage.token)
+			fd.append('list_id', id)
+
+			await axios.post("server.php?action=deletecompleted",fd).then(function(response){
+				// console.log(response.data)
+				if(response.data.error){
+					v.$store.dispatch('addNotification',{
+						type: "error",
+						message: response.data.message
+					})
+					// return response.data.error;						
+				}else{
+					console.log(response.data);
+					
+					v.$store.dispatch('addNotification',{
+						type: "success",
+						message: "Successfully deleted completed todos."
+					})	
+				}				
+			}).then(() =>{
+				v.showDeleteAllPrompt = false;
+				v.isLoading = false;
+				v.getTodos();
+			})
+		},
+		editCurrentList(id){
+			this.showEditListPrompt = true;
+			this.listActive = false;
+			this.getFriends();
+			this.getCurrentAccess();
+			console.log(id)
+		},
+		async editList(){
+			var v = this;
+			var fd = new FormData();
+			fd.append('id', localStorage.id);
+			fd.append('token', localStorage.token)
+			fd.append('list_id', this.currentListId)
+			fd.append('list_description', this.currentListDescription)
+			fd.append('list_name', this.currentList)
+
+			await axios.post("server.php?action=editlist",fd).then(function(response){
+				// console.log(response.data)
+				if(response.data.error){
+					v.$store.dispatch('addNotification',{
+						type: "error",
+						message: response.data.message
+					})
+					// return response.data.error;						
+				}else{
+					console.log(response.data);
+					v.showEditListPrompt = false;
+					v.$store.dispatch('addNotification',{
+						type: "success",
+						message: response.data.message
+					})	
+				}
+
+				
+			}).then(() =>{
+				v.getLists();
+			})
+		},
+		async removeList(id=localStorage.id){
+			var v = this;
+			var fd = new FormData();
+			fd.append('id', localStorage.id);
+			fd.append('token', localStorage.token)
+			fd.append('user_id', id)
+			fd.append('list_id', this.currentListId)
+
+			await axios.post("server.php?action=removelist",fd).then(function(response){
+				// console.log(response.data)
+				if(response.data.error){
+					v.$store.dispatch('addNotification',{
+						type: "error",
+						message: response.data.message
+					})
+					// return response.data.error;						
+				}else{
+					console.log(response.data);
+					v.$store.dispatch('addNotification',{
+						type: "success",
+						message: response.data.message
+					})	
+				}
+
+				
+			}).then(() =>{
+				v.getLists();
+				v.getFriends();
+				v.getCurrentAccess();
+			})
 		},
 		async deleteItem(){
 			var v = this;
@@ -228,9 +469,17 @@ export default {
 			await axios.post("server.php?action=delete"+url,fd).then(function(response){
 				// console.log(response.data)
 				if(response.data.error){
-					return response.data.error					
+					v.$store.dispatch('addNotification',{
+						type: "error",
+						message: response.data.message
+					})	
+					// return response.data.error					
 				}else{
-					console.log(response.data);
+					v.$store.dispatch('addNotification',{
+						type: "success",
+						message: response.data.message
+					})	
+					// console.log(response.data);
 				}
 				
 			})
@@ -247,32 +496,35 @@ export default {
 
 
 		},
-		showList(id,name){
-			if(this.trashclicked == true){
-				return;
-			}
+		showList(id,name,owner,desc){
+			// if(this.trashclicked == true){
+			// 	return;
+			// }
 			this.listActive = true;
 			this.currentList = name;
 			this.currentListId = id;
-			console.log(id);
+			this.currentListOwner = owner;
+			this.currentListDescription = desc;
+			// console.log(id);
 			this.getTodos();
 		},
 		showLoader(){
-			if(this.trashclicked == true){
-				return;
-			}
+			// if(this.trashclicked == true){
+			// 	return;
+			// }
 			this.isLoading = true;
 			var v = this;
 			setTimeout(function(){
 				v.isLoading = false;
-				console.log(v.isLoading)
+				// console.log(v.isLoading)
 			}, 1000); 
 		},
-		async getLists(){
+		async getLists(loading=true){
 			var v = this;
 			var fd = new FormData();
 			fd.append('id', localStorage.id);
 			fd.append('token', localStorage.token)
+			this.isLoading = loading;
 			await axios.post("server.php?action=getlists",fd).then(function(response){
 				console.log(response.data)
 				if(response.data.error){
@@ -313,13 +565,14 @@ export default {
 				v.getTodos();
 			})
 		},
-		async getTodos(){
+		async getTodos(loading=true){
 			var v = this;
-			v.todos = [];
+			// v.todos = [];
 			var fd = new FormData();
 			fd.append('id', localStorage.id);
 			fd.append('list_id', v.currentListId);
 			fd.append('token', localStorage.token);
+			this.isLoading = loading;
 
 			await axios.post("server.php?action=gettodos",fd).then(function(response){
 				// console.log(response.data.lists)
@@ -332,6 +585,8 @@ export default {
 					v.isLoading = false;
 				}
 				
+			}).then(()=>{
+				// console.log(v.showDeleteAll)
 			})
         },
 		async saveOrderList(){
@@ -403,9 +658,9 @@ export default {
             }
         },
 		async markDone(todo_id){
-			if(this.trashclicked == true){
-				return;
-			}
+			// if(this.trashclicked == true){
+			// 	return;
+			// }
 			var v = this;
 			var fd = new FormData();
 			fd.append('id', localStorage.id);
@@ -425,13 +680,138 @@ export default {
 					
 				}
 			})
-		}
+		},
+		async getCurrentAccess(){
+			var v = this;
+			v.currentAccess = [];
+			var fd = new FormData();
+			fd.append('id', localStorage.id);
+			fd.append('token', localStorage.token);
+			fd.append('list_id', this.currentListId);
+			this.isLoading = true;
+
+			await axios.post("server.php?action=getlistusers",fd).then(function(response){
+				// console.log(response.data.lists)
+				if(response.data.error){
+					v.isLoading = false;
+				}else{
+					v.currentAccess = response.data.users;
+					console.log(response.data);
+					v.isLoading = false;
+				}
+				
+			})
+        },
+		async getFriends(){
+			var v = this;
+			v.friends = [];
+			var fd = new FormData();
+			fd.append('id', localStorage.id);
+			fd.append('token', localStorage.token);
+			this.isLoading = true;
+
+			await axios.post("server.php?action=getfriends",fd).then(function(response){
+				// console.log(response.data.lists)
+				if(response.data.error){
+					v.isLoading = false;
+				}else{
+					v.friends = response.data.friends;
+					console.log(response.data);
+					v.isLoading = false;
+				}
+				
+			})
+        },
+		async shareList(friendId){
+			var v = this;
+			var fd = new FormData();
+			fd.append('id', localStorage.id);
+			fd.append('token', localStorage.token);
+			fd.append('friend_id', friendId);
+			fd.append('list_id', v.currentListId);
+			this.isLoading = true;
+			console.log('friend_id: '+friendId)
+			console.log('list_id: '+v.currentListId)
+
+			await axios.post("server.php?action=sharelist",fd).then(function(response){
+				// console.log(response.data.lists)
+				if(response.data.error){
+					v.isLoading = false;
+					v.$store.dispatch('addNotification',{
+						type: "error",
+						message: response.data.message
+					})
+				}else{
+					console.log(response.data);
+					v.$store.dispatch('addNotification',{
+						type: "success",
+						message: response.data.message
+					})
+					v.getFriends();
+					v.getCurrentAccess();
+					v.isLoading = false;
+				}
+				
+			})
+		},
+		refreshData(){
+            console.log("refresh data")
+            this.timer = setInterval(() => {
+				if(this.currentPage=='todoList'){
+					this.getTodos(false);
+				}else if(this.currentPage=='lists'){
+					this.getLists(false);
+				}
+            }, 5000)
+        },
 	},
 	created() {
 		var v = this;
 		v.getLists();
+		const unregisterRouterGuard = this.$router.beforeEach((to,from,next) => {
+			var nextVar = false;
+			setTimeout(()=>{
+				//have to delay a tiny bit so the value can be updated, then do our checks
+
+				// console.log("force route: "+v.forceRoute)
+				if(v.forceRoute){
+					// console.log('force')
+					next();
+					return;
+				}
+				
+				if(this.currentPage == 'lists') {
+					nextVar = true;
+				}
+				this.back();
+
+				if(this.forceRoute){
+					nextVar = true;
+					next(nextVar);
+					return
+				}
+				next(nextVar);
+			},10)
+			
+		})
+		emitter.on('hook:destroyed',()=>{
+			unregisterRouterGuard()
+		})
+	},
+	mounted() {
+		this.refreshData();
+	},
+	unmounted() {
+		clearInterval(this.timer)
 	},
     computed: {
+		listOwner() {
+			if(localStorage.username == this.currentListOwner) {
+				return true;
+			} else {
+				return false;
+			}
+		},
         dragOptions() {
             return {
                 animation: 200,
@@ -440,6 +820,18 @@ export default {
                 ghostClass: "ghost"
             };
         },
+		showDeleteAll(){
+			if(this.todos == null){
+				return false;
+			}
+			console.log(this.todos)
+			// console.log("test"+this.todos.some(code=> code.done === '1'));
+			return this.todos.some(code=> code.done === '1')
+
+		},
+		forceRoute(){
+			return this.$store.getters.forceRouterGetter;
+		}
     },
 }
 </script>

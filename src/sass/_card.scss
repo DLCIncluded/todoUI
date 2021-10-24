@@ -1,9 +1,8 @@
 .card {
-	width: 100%;
+	width: 95%;
 	position: absolute;
 	margin-left: auto;
 	margin-right: auto;
-
 
 	
 	background-color: $card-body-color;
@@ -12,7 +11,22 @@
 	border-radius: .5em;
 	transition: all .35s ease;
 
+	.friends {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		margin-left:1em;
+		font-size: 1.2em;
 
+		& li{
+			list-style-type: none;
+			margin-bottom: .5em;
+		}
+	}
+	
+	.friend-item {
+		cursor:pointer;
+	}
 	
 
 	&-head {
@@ -34,6 +48,13 @@
 		margin-right:.3em;
 		color:$color-primary;	
 		cursor: pointer;	
+	}
+	.edit-button {
+		margin-top:auto;
+		margin-bottom: auto;
+		margin-right:.5em;
+		color:$color-primary;	
+		cursor: pointer;
 	}
 
 	.cancel-btn {

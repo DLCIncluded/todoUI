@@ -1,24 +1,33 @@
 <template>
-<div class="tab" @click="this.showNav=true">
+<!-- <div class="tab" @click="this.showNav=true">
 	<i class="fas fa-chevron-circle-down" ></i>Menu
-</div>
-<div class="nav-container" :class="showNav ? 'active' : ''">
-	<div class="nav card" @click="this.showNav=false">
-		<h2>Navigation</h2>
-		<div class="list-item"><router-link to="/">Home</router-link></div>
-		<div class="list-item"><router-link to="/about">About</router-link></div>
-		<div class="list-item"><router-link to="/lists">Lists</router-link></div>
-		<div class="list-item" v-if="!isLoggedIn"><router-link to="/login">Login</router-link></div>
-		<div class="list-item" v-else><a @click.prevent='logout' href="">Logout</a></div>
-		<div class="list-item closebtn"><i class="fas fa-chevron-circle-up"></i> Close</div>
+</div> -->
+<div class="nav-container" ><!-- :class="showNav ? 'active' : ''" -->
+	<h2>Todo App</h2>
+	<input type="checkbox" v-model="showNav" name="nav-toggle" id="nav-toggle" class="nav-toggle">
+	<div class="nav" @click="showNav=false;forceRoute()">
+		<div class="nav-item"><router-link to="/">Home</router-link></div>
+		<div class="nav-item"><router-link to="/about">About</router-link></div>
+		<div class="nav-item"><router-link to="/lists">Lists</router-link></div>
+		<div class="nav-item" v-if="isLoggedIn"><router-link to="/friends">Friends</router-link></div>
+		<div class="nav-item" v-if="!isLoggedIn"><router-link to="/login">Login</router-link></div>
+		<div class="nav-item" v-if="!isLoggedIn"><router-link to="/register">Register</router-link></div>
+		<div class="nav-item" v-else><a @click.prevent='logout' href="">Logout</a></div>
+		<!-- <div class="nav-item closebtn"><i class="fas fa-chevron-circle-up"></i> Close</div> -->
 	</div>
+	<label for="nav-toggle" class="nav-toggle-label"><span></span></label>
 	
 </div>
 
   <router-view/>
+  
+<notifications-panel></notifications-panel>
+
 </template>
 
 <script>
+import NotificationsPanel from './components/NotificationsPanel'
+
 export default {
 	data() {
 		return {
@@ -27,7 +36,7 @@ export default {
 	},
 	created() {
 		this.$store.dispatch('authCheck');
-		console.log(this.$store.getters.authGetter)
+		// console.log(this.$store.getters.authGetter)
 	},
 	computed: {
 		isLoggedIn(){
@@ -37,7 +46,13 @@ export default {
 	methods: {
 		logout(){
 			this.$store.dispatch('logout')
+		},
+		forceRoute() {
+			this.$store.dispatch('setForceRoute');
 		}
+	},
+	components:{
+		NotificationsPanel
 	}
 }
 </script>

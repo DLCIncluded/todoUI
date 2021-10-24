@@ -7,23 +7,58 @@ export default createStore({
   state() {
 		return {
 			loggedIn: false,
+			forceRouter: false,
+			notifications: [
+				// {
+				// 	type: "error",
+				// 	message: "There was an error"
+				// }
+			]
 		}
   },
   mutations: {
 	setAuth(state,msg){
         state.loggedIn = msg;
     },
+	PUSH_NOTIFICATION(state,notification){
+		state.notifications.push({
+			...notification,
+			id: (Math.random().toString(36) + Date.now().toString(36)).substr(2)
+		});
+	},
+	REMOVE_NOTIFICATION(state,notificationToRemove){
+		state.notifications = state.notifications.filter(notification => {
+			return notification.id != notificationToRemove.id;
+		})
+	},
+	FORCE_ROUTE(state){
+		state.forceRouter = true;
+		// console.log(state.forceRouter)
+		setTimeout(()=>{
+			state.forceRouter = false;
+			// console.log(state.forceRouter);
+		},1000)
+	}
   },
   getters: {
 	authGetter(state){
         return state.loggedIn;
     },
+	forceRouterGetter(state){
+        return state.forceRouter;
+    },
   },
   actions: {
-	addNotification(){
-		console.log('notification placeholder');
+	addNotification({commit}, notification){
+		commit('PUSH_NOTIFICATION', notification);
 	},
-	async newList(commit, payload){
+	removeNotification({commit}, notification) {
+		commit("REMOVE_NOTIFICATION",notification);
+	},
+	setForceRoute({commit}, type){
+		commit("FORCE_ROUTE", type);
+	},
+	async newList({dispatch}, payload){
 		console.log('creating new list')
 		
 		var fd = new FormData();
@@ -32,11 +67,22 @@ export default createStore({
 		fd.append('token', localStorage.token);
 		fd.append('id', localStorage.id);
 		await axios.post("server.php?action=newlist",fd).then(function(response){
-			console.log(response);
+			if(response.data.error) {
+				dispatch('addNotification', {
+                    type: "error",
+                    message: response.data.message
+                })
+			}else{
+				dispatch('addNotification', {
+                    type: "success",
+                    message: response.data.message
+                })
+			}
+			// console.log(response);
 		});
 
 	},
-	async newTodo(commit, payload){
+	async newTodo({dispatch}, payload){
 		console.log('creating new todo')
 		var fd = new FormData();
         fd.append('list_id', payload.list_id);
@@ -45,7 +91,18 @@ export default createStore({
 		fd.append('token', localStorage.token);
 		fd.append('id', localStorage.id);
 		await axios.post("server.php?action=newtodo",fd).then(function(response){
-			console.log(response);
+			if(response.data.error) {
+				dispatch('addNotification', {
+                    type: "error",
+                    message: response.data.message
+                })
+			}else{
+				dispatch('addNotification', {
+                    type: "success",
+                    message: response.data.message
+                })
+			}
+			// console.log(response);
 		});
 
 	},
@@ -64,13 +121,10 @@ export default createStore({
 
                 console.log("error "+ response.data.message);
                 // commit('setError', response.data.message);
-                // dispatch('addNotification', {
-                //     type: "error",
-                //     message: response.data.message
-                // })
-
-                // window.scrollTo(0,0);
-                // v.showMsg('error',response.data.message);
+                dispatch('addNotification', {
+                    type: "error",
+                    message: response.data.message
+                })
             }else if(response.data.message === "successfully logged in"){
                 console.log("success "+ response.data.message);
 
@@ -82,12 +136,12 @@ export default createStore({
                 // localStorage.expires = response.data.expires;
                 
                 commit('setAuth', true)//need to set the state loggedIn variable as true
-				dispatch('addNotification');
+				
                 // // commit('setSuccess', "Logged in successfully")
-                // dispatch('addNotification', {
-                //     type: "success",
-                //     message: "Logged in successfully"
-                // })
+                dispatch('addNotification', {
+                    type: "success",
+                    message: "Logged in successfully"
+                })
                 //push user to page
                 router.replace('/');
             }else{
@@ -122,6 +176,7 @@ export default createStore({
                     // console.log("token invalid");
                     console.log(response.data)
                     // dispatch('logout', {type: 'error', msg: 'Session Invalid, please login again.'});
+					dispatch('logout');
                     // commit('changeCheckingAuth', false)
 					dispatch('addNotification');
                 }else{
@@ -136,12 +191,16 @@ export default createStore({
             // commit('changeCheckingAuth', false)
         }
     },
-	logout({commit}) {
+	logout({commit,dispatch}) {
 		commit('setAuth', false);
 		localStorage.removeItem("id");
         localStorage.removeItem("username");
         localStorage.removeItem("email");
         localStorage.removeItem("token");
+		dispatch('addNotification', {
+			type: "success",
+			message: "Logged out successfully."
+		})
 		router.replace('/');
 	}
   },

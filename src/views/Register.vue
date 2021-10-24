@@ -1,8 +1,8 @@
 <template>
 	<div class="container">
-		<div class="card" v-if="!resetPasswordForm">
+		<div class="card">
 			<div class="card-head" >
-				<h1>Login</h1>
+				<h1>Register</h1>
 			</div>
 			<div class="card-body">
 				<div :class="isLoading ? '' : 'not-active'">
@@ -10,54 +10,22 @@
 						<div></div><div></div><div></div><div></div>
 					</div>
 				</div>
-				<form @submit.prevent="login()">
-					<div class="input-group">
-						<!-- <h3>Username</h3>  -->
-						<input type="text" name="username" v-model="username" placeholder="Username"/>
-					</div>
-					<div class="input-group">
-						<!-- <h3>Password</h3>  -->
-						<input type="password" v-model="password" name="password" placeholder="Password"/>
-					</div>
-					<div class="input-group">
-						<!-- <h3>Password</h3>  -->
-						<input type="submit" name="submit"/>
-					</div>
-				</form>
-				<div class="input-group">
-					<!-- <h3>Password</h3>  -->
-					<a href="#" @click.prevent="requestReset()">Forgot Password?</a> - Have a code? <a href="#" @click.prevent="resetPasswordForm = !resetPasswordForm">Reset Password</a> - <router-link to="/register">Register</router-link>
-				</div>
-			</div>
-		</div>
-
-
-		<div class="card" v-if="resetPasswordForm">
-			<div class="card-head" >
-				<h1>Reset Password</h1>
-			</div>
-			<div class="card-body">
-				<div :class="isLoading ? '' : 'not-active'">
-					<div class="spinner">
-						<div></div><div></div><div></div><div></div>
-					</div>
-				</div>
-				<form @submit.prevent="resetPassword()">
+				<form @submit.prevent="register()">
 					<div class="input-group">
 						<h3>Username</h3> 
 						<input type="text" name="username" v-model="username" placeholder="Username"/>
 					</div>
 					<div class="input-group">
-						<h3>Reset Code From Email</h3> 
-						<input type="text" v-model="resetCode" name="resetCode" placeholder="Code From Email"/>
+						<h3>Email</h3> 
+						<input type="text" v-model="email" name="email" placeholder="Email"/>
 					</div>
 					<div class="input-group">
-						<h3>New Password</h3> 
-						<input type="password" v-model="newPassword" name="newPassword" placeholder="New Password"/>
+						<h3>Password</h3> 
+						<input type="password" v-model="password" name="password" placeholder="Password"/>
 					</div>
 					<div class="input-group">
-						<h3>Repeat New Password</h3> 
-						<input type="password" v-model="newPasswordRepeat" name="newPasswordRepeat" placeholder="Repeat New Password"/>
+						<h3>Repeat Password</h3> 
+						<input type="password" v-model="repeatPassword" name="repeatPassword" placeholder="Repeat Password"/>
 					</div>
 					<div class="input-group">
 						<input type="submit" name="submit"/>
@@ -65,7 +33,7 @@
 				</form>
 				<div class="input-group">
 					<!-- <h3>Password</h3>  -->
-					<a href="#" @click.prevent="resetPasswordForm = false">Cancel</a>
+					Already have an account? - <router-link to="/login">Login!</router-link>
 				</div>
 			</div>
 		</div>
@@ -79,11 +47,9 @@ export default {
 	data() {
 		return {
 			username: '',
+			email: '',
 			password: '',
-			resetCode: '',
-			newPassword: '',
-			newPasswordRepeat: '',
-			resetPasswordForm: false,
+			repeatPassword: '',
 			isLoading: false
 		}
 	},
@@ -91,15 +57,7 @@ export default {
 		test(){
 			console.log('test');
 		},
-		async login(){
-			
-			var v=this;
-			await v.$store.dispatch('login', {
-				username: v.username,
-				password: v.password,
-			});
-		},
-		async requestReset(){
+		async register(){
 			var v = this;
 			if(this.username.trim() == ""){
 				this.$store.dispatch('addNotification', {
@@ -108,28 +66,56 @@ export default {
 				});
 				return;
 			}
+			if(this.email.trim() == ""){
+				this.$store.dispatch('addNotification', {
+					type: "error",
+					message: "please input a username",
+				});
+				return;
+			}
+			if(this.password.trim() == ""){
+				this.$store.dispatch('addNotification', {
+					type: "error",
+					message: "please input a password",
+				});
+				return;
+			}
+			if(this.repeatPassword.trim() == ""){
+				this.$store.dispatch('addNotification', {
+					type: "error",
+					message: "please input a password",
+				});
+				return;
+			}
+			if(this.password.trim() != this.repeatPassword.trim()){
+				this.$store.dispatch('addNotification', {
+					type: "error",
+					message: "Passwords do not match.",
+				});
+				return;
+			}
 
 			var fd = new FormData();
 			fd.append('username', this.username);
+			fd.append('email', this.email);
+			fd.append('password', this.password);
 			this.isLoading = true;
 
-			await axios.post("server.php?action=passwordresetrequest",fd).then(function(response){
+			await axios.post("server.php?action=register",fd).then(function(response){
 				if(response.data.error){
-					
 					console.log(response.data.message);
 					v.$store.dispatch('addNotification', {
 						type: "error",
 						message: response.data.message,
 					});
 				}else{
+					v.$router.push('/login');
 					v.$store.dispatch('addNotification', {
 						type: "success",
 						message: response.data.message,
 					});
-				}
-				
+				}				
 			}).then(()=>{
-				v.resetPasswordForm = true;
 				v.isLoading = false;
 			})
 

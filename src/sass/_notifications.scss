@@ -1,0 +1,47 @@
+
+.notification-panel{
+	position:fixed;
+	bottom: 10px;	
+	width:100%;
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	pointer-events: none; 
+}
+.notification {
+	padding:1em;
+	background-color: $cerulean;
+	position: relative;
+	max-width: 400px;
+	height: 3.5em;
+	margin-bottom: .5em;
+	& .close{
+		position:absolute;
+		top:-10px;
+		right:-5px;
+		pointer-events: auto; 
+		cursor: pointer;
+	}
+}
+.status-bar {
+    position: absolute;
+    display:block;
+    left: 0;
+    top:100%;
+    margin:0 auto;
+    height: 2px;
+    background-color: white;
+    width: 100%;
+    transition: width 1s;
+	animation: status-bar 3s linear;
+}
+@keyframes status-bar {
+	0% {
+		width:0%;
+	}
+	100% {
+		width:100%
+	}
+}
+

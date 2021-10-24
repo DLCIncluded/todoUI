@@ -27,6 +27,18 @@ const routes = [
     name: 'Login',
 	meta: {requiresUnAuth: true},
     component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue')
+  },
+  {
+    path: '/register',
+    name: 'Register',
+	meta: {requiresUnAuth: true},
+    component: () => import(/* webpackChunkName: "register" */ '../views/Register.vue')
+  },
+  {
+    path: '/friends',
+    name: 'Friends',
+	meta: {requiresAuth: true},
+    component: () => import(/* webpackChunkName: "friends" */ '../views/Friends.vue')
   }
 ]
 
@@ -38,6 +50,10 @@ const router = createRouter({
 router.beforeEach(function(to,from,next){
 	if(to.meta.requiresAuth && !store.getters.authGetter){
 		// if we need to be logged in and we are note logged 
+		store.dispatch('addNotification', {
+			type: "error",
+			message: "Please Login to view that page."
+		});
 		next('/login');
 	} else if(to.meta.requiresUnAuth && store.getters.authGetter){
 		//if we shouldnt be logged in and try to get to something while logged in ie register / login

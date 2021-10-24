@@ -5,7 +5,7 @@
 				<h1>About</h1>
 			</div>
 			<div class="card-body">		
-				<div class="" @click="goTo('/lists')">	
+				<div class="">	
 					<p>This is a list app I put together for myself, but you are free to use it if you'd like.</p>
 
 					<h3>Basic Features</h3>
@@ -19,6 +19,7 @@
 								<li>More possibly in the future</li>
 							</ul>
 						<li>"Stay on page" setting for new todo(multi entry)</li>
+						<li>Auto Refresh(5sec) - as close as possible to "live" updates</li>
 						<li>Delete List/Todo</li>
 						<li>Friend System</li>
 							<ul style="margin-left:2em">
@@ -28,12 +29,52 @@
 							</ul>
 						<li>Organize lists/todos by drag and dropping</li>
 							<ul style="margin-left:2em">
-								<li>On mobile you have to hold for at least .2sec before dragging</li>
+								<li>FYI On mobile you have to hold for at least .2sec before dragging</li>
 							</ul>
 
 					</ul>
+
+					<!-- <button @click="show = !show">Test</button>
+
+					<transition name="fade">
+						<div v-if="show">Show Me</div>
+					</transition>
+
+					<button @click="test"> test notification</button> -->
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
+
+<script>
+export default {
+	data() {
+		return {
+			show: true
+		}
+	},
+	methods: {
+		test() {
+			this.$store.dispatch(
+				"addNotification", {
+					type: "success",
+					message: "this is a test"
+				}
+			)
+		}
+	}
+}
+</script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
