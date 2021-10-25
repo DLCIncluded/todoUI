@@ -3,17 +3,20 @@
 	<i class="fas fa-chevron-circle-down" ></i>Menu
 </div> -->
 <div class="nav-container" ><!-- :class="showNav ? 'active' : ''" -->
+	<div class="nofication-bell"  @click="forceRoute()">
+		<router-link to="/friends"><i class="far fa-bell cursor-pointer"> {{numRequests}}</i></router-link>
+	</div>
 	<h2>Shit To Do</h2>
 	<input type="checkbox" v-model="showNav" name="nav-toggle" id="nav-toggle" class="nav-toggle">
-	<div class="nav" @click="forceRoute()">
+	<div class="nav" @click="forceRoute();showNav=false;">
 		<div class="nav-item" v-if="isLoggedIn">Welcome {{username}}</div>
-		<div class="nav-item" @click="showNav=false;"><router-link to="/">Home</router-link></div>
-		<div class="nav-item" @click="showNav=false;"><router-link to="/about">About</router-link></div>
-		<div class="nav-item" @click="showNav=false;"><router-link to="/lists">Lists</router-link></div>
-		<div class="nav-item" @click="showNav=false;" v-if="isLoggedIn"><router-link to="/friends">Friends</router-link></div>
-		<div class="nav-item" @click="showNav=false;" v-if="!isLoggedIn"><router-link to="/login">Login</router-link></div>
-		<div class="nav-item" @click="showNav=false;" v-if="!isLoggedIn"><router-link to="/register">Register</router-link></div>
-		<div class="nav-item" @click="showNav=false;" v-else><a @click.prevent='logout' href="">Logout</a></div>
+		<div class="nav-item"><router-link to="/">Home</router-link></div>
+		<div class="nav-item"><router-link to="/about">About</router-link></div>
+		<div class="nav-item"><router-link to="/lists">Lists</router-link></div>
+		<div class="nav-item" v-if="isLoggedIn"><router-link to="/friends">Friends</router-link></div>
+		<div class="nav-item" v-if="!isLoggedIn"><router-link to="/login">Login</router-link></div>
+		<div class="nav-item" v-if="!isLoggedIn"><router-link to="/register">Register</router-link></div>
+		<div class="nav-item" v-else><a @click.prevent='logout' href="">Logout</a></div>
 		<!-- <div class="nav-item closebtn"><i class="fas fa-chevron-circle-up"></i> Close</div> -->
 	</div>
 	<label for="nav-toggle" class="nav-toggle-label"><span></span></label>
@@ -44,10 +47,13 @@ export default {
 	data() {
 		return {
 			showNav: false,
+			timer:null,
 		}
 	},
 	created() {
 		this.$store.dispatch('authCheck');
+		this.$store.dispatch('getFriendRequests');
+		this.refreshData();		
 		// console.log(this.$store.getters.authGetter)
 	},
 	computed: {
@@ -59,9 +65,19 @@ export default {
 		},
 		page(){
 			return this.$route.name;
+		},
+		numRequests(){
+			return this.$store.getters.requestsNumGetter;
 		}
 	},
 	methods: {
+		refreshData(){
+            this.timer = setInterval(() => {
+				this.$store.dispatch('getFriendRequests');
+				this.$store.dispatch('getPendingRequests');
+				this.$store.dispatch('getFriends');
+            }, 5000)
+        },
 		logout(){
 			this.$store.dispatch('logout')
 		},
@@ -71,7 +87,10 @@ export default {
 	},
 	components:{
 		NotificationsPanel
-	}
+	},
+	unmounted() {
+		clearInterval(this.timer)
+	},
 }
 </script>
 

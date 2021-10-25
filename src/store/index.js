@@ -9,17 +9,20 @@ export default createStore({
 			loggedIn: false,
 			forceRouter: false,
 			username: null,
+			pendingRequests: null,
+			requests: [],
+			friends: [],
 			notifications: [
 				// {
 				// 	type: "error",
 				// 	message: "There was an error",
 				// 	id: '0000',
 				// },
-				// {
-				// 	type: "success",
-				// 	message: "Successfully did something",
-				// 	id: '1111',
-				// }
+				{
+					type: "success",
+					message: "This is a long success message, to test the notifications panel. This is a long success message, to test the notifications panel",
+					id: '1111',
+				}
 			]
 		}
   },
@@ -30,6 +33,15 @@ export default createStore({
 	setUser(state,user){
         state.username = user;
     },
+	setRequests(state, requests) {
+		state.requests = requests;
+	},
+	setPendingRequests(state, requests) {
+		state.pendingRequests = requests;
+	},
+	setFriends(state, friends) {
+		state.friends = friends;
+	},
 	PUSH_NOTIFICATION(state,notification){
 		state.notifications.push({
 			...notification,
@@ -59,6 +71,23 @@ export default createStore({
     },
 	userGetter(state){
 		return state.username;
+	},
+	requestsGetter(state) {
+		return state.requests;
+	},
+	pendingRequestsGetter(state) {
+		return state.pendingRequests;
+	},
+	friendsGetter(state) {
+		return state.friends;
+	},
+	requestsNumGetter(state){
+		if(state.requests){
+			return state.requests.length;
+		} else {
+			return 0;
+		}
+		
 	}
   },
   actions: {
@@ -118,6 +147,76 @@ export default createStore({
 			// console.log(response);
 		});
 
+	},
+	async getFriendRequests({commit,dispatch, state}){
+		if(!state.loggedIn){
+			return;
+		}
+		var fd = new FormData();
+		fd.append('id', localStorage.id);
+		fd.append('token', localStorage.token);
+		// this.isLoading = true;
+
+		await axios.post("server.php?action=getfriendrequests",fd).then(function(response){
+			// console.log(response.data.lists)
+			if(response.data.error){
+				commit('setRequests',[]);
+				dispatch('addNotification', {
+                    type: "error",
+                    message: response.data.message
+                })		
+			}else{
+				commit('setRequests',response.data.requests);
+			}
+		})
+	},
+	async getPendingRequests({commit,dispatch, state}){
+		if(!state.loggedIn){
+			return;
+		}
+		var fd = new FormData();
+		fd.append('id', localStorage.id);
+		fd.append('token', localStorage.token);
+		// this.isLoading = true;
+
+		await axios.post("server.php?action=getpendingfriendrequests",fd).then(function(response){
+			// console.log(response.data.lists)
+			if(response.data.error){
+				commit('setPendingRequests',[]);
+				dispatch('addNotification', {
+                    type: "error",
+                    message: response.data.message
+                })			
+			}else{
+				commit('setPendingRequests',response.data.requests);
+				// v.sentRequests = response.data.requests;
+				// console.log(response.data);
+				// v.isLoading = false;
+			}
+			
+		})
+	},
+	async getFriends({commit,dispatch, state}){
+		if(!state.loggedIn){
+			return;
+		}
+		var fd = new FormData();
+		fd.append('id', localStorage.id);
+		fd.append('token', localStorage.token);
+		// this.isLoading = true;
+
+		await axios.post("server.php?action=getfriends",fd).then(function(response){
+			// console.log(response.data.lists)
+			if(response.data.error){
+				commit('setFriends',null);
+				dispatch('addNotification', {
+                    type: "error",
+                    message: response.data.message
+                })		
+			}else{
+				commit('setFriends',response.data.friends);
+			}
+		})
 	},
 	async login({ commit,dispatch }, payload){
         console.log('logging in')

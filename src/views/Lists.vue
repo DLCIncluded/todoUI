@@ -179,74 +179,96 @@
 
 	<!-- <div class="card-container" :class="showEditListPrompt ? '' : 'not-active-right'"> -->
 	<transition name="not-active-right">
-	<div class="card-container" v-if="currentPage=='editList'">
-		<div class="card">
-			<div class="card-head">
-				<!-- <i class="back-button fas fa-chevron-circle-left fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
-				<h2>Edit List</h2>
-				<!-- <i class="cancel-btn fas fa-times-circle fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
-			</div>
-			<div class="card-body">
-				<div>
-					<form @submit.prevent="editList();setPage('todoList')">
-						<div class="input-group">
-							List Name: <input type="text" name="list-name" v-model="currentList" placeholder="List Name" autocomplete="off" />
-						</div>
-						<div class="input-group">
-							Description: <input type="text" v-model="currentListDescription" name="description" placeholder="List Description" autocomplete="off" />
-						</div>
-						<div class="input-group">
-							<button type="submit" name="submit">Save</button>
-						</div>
-					</form>
-				</div>			
-			</div>
-			<div class="card-body" >
-				<div v-if="listOwner">
-					Share with a friend:
-						<transition name="fade">
-							<!-- <div :class="isLoading ? '' : 'not-active'"> -->
-							<div v-if="isLoading">
-								<div class="spinner">
-									<div></div><div></div><div></div><div></div>
-								</div>
+		<div class="card-container" v-if="currentPage=='editList'">
+			<div class="card">
+				<div class="card-head">
+					<!-- <i class="back-button fas fa-chevron-circle-left fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
+					<h2>Edit List</h2>
+					<!-- <i class="cancel-btn fas fa-times-circle fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
+				</div>
+				<div class="card-body">
+					<div>
+						<form @submit.prevent="editList();setPage('todoList')">
+							<div class="input-group">
+								List Name: <input type="text" name="list-name" v-model="currentList" placeholder="List Name" autocomplete="off" />
 							</div>
-						</transition>
-						<ul class="friends">
-							
-							<li v-if="!friends || friends.length == 0">
-								No friends to share with.
-							</li>
-							<li v-else v-for="friend in friends" :key="friend.id" class="friend-item" @click="shareList(friend.user_id)">
-								<i class="fas fa-external-link-alt"></i> {{friend.username}}
-							</li>
-						</ul>
-				</div>		
-				<div v-else>
-					You don't Own this list, but you can remove it from your list:
-
-					<ul class="friends">
-						
-						<li @click="removeList()" class="cursor-pointer">
-							<i class="far fa-trash-alt"></i> Remove List
-						</li>
-					</ul>
-				</div>	
-			</div>
-			<div class="card-body">
-				Users with Access:
-				
-				<ul class="friends">
-					<li v-if="!currentAccess">
-						No one has access but you.
-					</li>
-					<li v-else v-for="user in currentAccess" :key="user.id" class="friend-item">
-						<i class="fas fa-external-link-alt"></i> {{user.username}} - <span @click="removeList(user.id)">Remove</span>
-					</li>
-				</ul>
+							<div class="input-group">
+								Description: <input type="text" v-model="currentListDescription" name="description" placeholder="List Description" autocomplete="off" />
+							</div>
+							<div class="input-group">
+								<button type="submit" name="submit">Save</button>
+							</div>
+						</form>
+					</div>			
+				</div>
 			</div>
 		</div>
-	</div>
+	</transition>
+	<transition name="not-active-right">
+		<div class="card-container" v-if="currentPage=='shareList'">
+			<div class="card">
+				<div class="card-head">
+					<!-- <i class="back-button fas fa-chevron-circle-left fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
+					<h2>Share List</h2>
+					<!-- <i class="cancel-btn fas fa-times-circle fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
+				</div>
+				<div class="card-body" >
+					<div v-if="listOwner">
+						Share with a friend:
+							<transition name="fade">
+								<!-- <div :class="isLoading ? '' : 'not-active'"> -->
+								<div v-if="isLoading">
+									<div class="spinner">
+										<div></div><div></div><div></div><div></div>
+									</div>
+								</div>
+							</transition>
+							<ul class="friends">
+								
+								<li v-if="!friends || friends.length == 0">
+									No friends to share with.
+								</li>
+								<li v-else v-for="friend in friends" :key="friend.id" class="friend-item" @click="shareList(friend.user_id)">
+									<i class="fas fa-external-link-alt"></i> {{friend.username}}
+								</li>
+							</ul>
+					</div>		
+					<div v-else>
+						You don't Own this list, but you can remove it from your account:
+
+						<ul class="friends">
+							
+							<li @click="removeList()" class="cursor-pointer">
+								<i class="far fa-trash-alt"></i> Remove List
+							</li>
+						</ul>
+					</div>	
+				</div>
+				<div class="card-body" v-if="listOwner">
+					Users with Access:
+					
+					<ul class="friends">
+						<li v-if="!currentAccess">
+							No one has access but you.
+						</li>
+						<li v-else v-for="user in currentAccess" :key="user.id" class="friend-item">
+							{{user.username}} - <span @click="removeList(user.id)">Remove</span>
+						</li>
+					</ul>
+				</div>
+				<div class="card-body" v-else>
+					Users with Access:
+					<ul class="friends">
+						<li v-if="!currentAccess">
+							No one has access but you.
+						</li>
+						<li v-else v-for="user in currentAccess" :key="user.id" class="friend-item" style="cursor:default!important">
+							{{user.username}}
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
 	</transition>
 </div>
 <transition name="fade">
@@ -299,6 +321,10 @@
 <div class="list-nav">
 	<div>
 		<i v-if="currentPage=='todoList'" class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false;setPage('lists')"></i>
+		<i v-if="currentPage=='shareList'" class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false;setPage('todoList')"></i>
+	</div>
+	<div v-if="currentPage=='todoList'">
+		<i  class="far fa-share-square fa-2x" @click="setPage('shareList');getFriends();getCurrentAccess();"></i>
 	</div>
 	<div>
 		<!-- <i v-if="currentPage=='newTodo'" class="back-button fas fa-chevron-circle-left fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i> -->
@@ -307,10 +333,10 @@
 		<i v-if="currentPage=='newList'" class="cancel-btn fas fa-times-circle fa-2x" @click="showNewListPrompt=false;setPage('lists')"></i>
 		<i v-if="currentPage=='editList'" class="cancel-btn fas fa-times-circle fa-2x" @click="showEditListPrompt=false;listActive=true;setPage('todoList')"></i>
 		<i v-if="currentPage=='todoList'" class="edit-button far fa-edit fa-2x" @click="editCurrentList(currentListId);setPage('editList')"></i>
+		
 	</div>
-	
 	<div>
-		<i v-if="currentPage=='todoList'" class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true;setPage('newTodo')"></i>
+		<i v-if="currentPage=='todoList'" class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true;setPage('newTodo');"></i>
 	</div>
 </div>
 
@@ -382,6 +408,10 @@ export default {
 				this.showEditListPrompt=false;
 				this.listActive=true;
 			}
+			if(this.currentPage == 'shareList'){
+				this.setPage("todoList");
+				this.listActive=true;
+			}
 			if(this.currentPage == 'deleteAll') {
 				this.setPage("todoList");
 				this.showDeleteAllPrompt=false;
@@ -439,8 +469,8 @@ export default {
 		editCurrentList(id){
 			this.showEditListPrompt = true;
 			this.listActive = false;
-			this.getFriends();
-			this.getCurrentAccess();
+			// this.getFriends();
+			// this.getCurrentAccess();
 			console.log(id)
 		},
 		async editList(){

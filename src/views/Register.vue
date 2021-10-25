@@ -28,7 +28,7 @@
 						<input type="password" v-model="repeatPassword" name="repeatPassword" placeholder="Repeat Password"/>
 					</div>
 					<div class="input-group">
-						<input type="submit" name="submit"/>
+						<button type="submit" name="submit">Register</button>
 					</div>
 				</form>
 				<div class="input-group">

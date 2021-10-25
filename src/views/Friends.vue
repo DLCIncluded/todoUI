@@ -6,7 +6,7 @@
 					<h3>Friends</h3>
 				</div>
 				<div class="card-body">		
-					Friends: {{friendReqUsername}}
+					Friends: 
 					<ul>
 						<li v-if="!friends">No Friends</li>
 						<li v-for="friend in friends" :key="friend.id"><span>{{friend.username}}</span> <i class="fas fa-user-times  cursor-pointer error-text" @click.prevent="showDeletePrompt=true;toDeleteId=friend.id"> Remove Friend</i></li>
@@ -84,9 +84,6 @@ import axios from 'axios'
 export default {
 	data() {
 		return {
-			friends: null,
-			friendRequests: null,
-			sentRequests: null,
 			friendReqUsername: "",
 			showDeletePrompt: false,
 			toDeleteId: null,
@@ -122,66 +119,72 @@ export default {
 			})
         },
 		async getFriends(){
-			var v = this;
-			v.friends = [];
-			var fd = new FormData();
-			fd.append('id', localStorage.id);
-			fd.append('token', localStorage.token);
-			this.isLoading = true;
+			// var v = this;
+			// v.friends = [];
+			// var fd = new FormData();
+			// fd.append('id', localStorage.id);
+			// fd.append('token', localStorage.token);
+			// this.isLoading = true;
 
-			await axios.post("server.php?action=getfriends",fd).then(function(response){
-				// console.log(response.data.lists)
-				if(response.data.error){
-					// v.isLoading = false;
-					return response.data.error		
-				}else{
-					v.friends = response.data.friends;
-					console.log(response.data);
-					// v.isLoading = false;
-				}
+			// await axios.post("server.php?action=getfriends",fd).then(function(response){
+			// 	// console.log(response.data.lists)
+			// 	if(response.data.error){
+			// 		// v.isLoading = false;
+			// 		return response.data.error		
+			// 	}else{
+			// 		v.friends = response.data.friends;
+			// 		console.log(response.data);
+			// 		// v.isLoading = false;
+			// 	}
 				
-			})
+			// })
+			this.$store.dispatch('getFriends');
         },
 		async getFriendRequests(){
-			var v = this;
-			v.friendRequests = [];
-			var fd = new FormData();
-			fd.append('id', localStorage.id);
-			fd.append('token', localStorage.token);
-			// this.isLoading = true;
+			// var v = this;
+			// v.friendRequests = [];
+			// var fd = new FormData();
+			// fd.append('id', localStorage.id);
+			// fd.append('token', localStorage.token);
+			// // this.isLoading = true;
 
-			await axios.post("server.php?action=getfriendrequests",fd).then(function(response){
-				// console.log(response.data.lists)
-				if(response.data.error){
-					// v.isLoading = false;
-					return response.data.error		
-				}else{
-					v.friendRequests = response.data.requests;
-					console.log(response.data);
-					// v.isLoading = false;
-				}
-			})
+			// await axios.post("server.php?action=getfriendrequests",fd).then(function(response){
+			// 	// console.log(response.data.lists)
+			// 	if(response.data.error){
+			// 		// v.isLoading = false;
+			// 		return response.data.error		
+			// 	}else{
+			// 		v.friendRequests = response.data.requests;
+			// 		console.log(response.data);
+			// 		// v.isLoading = false;
+			// 	}
+			// })
+			// var v=this;
+			// v.friendRequests = await v.$store.dispatch('getFriendRequests');
+
+			this.$store.dispatch('getFriendRequests');
         },
 		async getPendingRequests(){
-			var v = this;
-			v.sentRequests = [];
-			var fd = new FormData();
-			fd.append('id', localStorage.id);
-			fd.append('token', localStorage.token);
-			// this.isLoading = true;
+			// var v = this;
+			// v.sentRequests = [];
+			// var fd = new FormData();
+			// fd.append('id', localStorage.id);
+			// fd.append('token', localStorage.token);
+			// // this.isLoading = true;
 
-			await axios.post("server.php?action=getpendingfriendrequests",fd).then(function(response){
-				// console.log(response.data.lists)
-				if(response.data.error){
-					// v.isLoading = false;
-					return response.data.error		
-				}else{
-					v.sentRequests = response.data.requests;
-					console.log(response.data);
-					// v.isLoading = false;
-				}
+			// await axios.post("server.php?action=getpendingfriendrequests",fd).then(function(response){
+			// 	// console.log(response.data.lists)
+			// 	if(response.data.error){
+			// 		// v.isLoading = false;
+			// 		return response.data.error		
+			// 	}else{
+			// 		v.sentRequests = response.data.requests;
+			// 		console.log(response.data);
+			// 		// v.isLoading = false;
+			// 	}
 				
-			})
+			// })
+			this.$store.dispatch('getPendingRequests');
         },
 		async friendRequest(){
 			var v = this;
@@ -332,8 +335,18 @@ export default {
 	},
 	created() {
 		this.refreshAll();
-	} 
-		
+	},
+	computed: {
+		friendRequests() {
+			return this.$store.getters.requestsGetter;
+		},
+		friends() {
+			return this.$store.getters.friendsGetter;
+		},
+		sentRequests() {
+			return this.$store.getters.pendingRequestsGetter;
+		}
+	}		
 	
 }
 </script>
