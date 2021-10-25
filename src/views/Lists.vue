@@ -20,7 +20,7 @@
 					</transition>
 					<transition name="fade">
 						<!-- <div :class="isLoading ? 'not-active' : ''">	 -->
-						<div v-if="!isLoading">	
+						<div v-if="!isLoading && lists!=null">
 							<draggable 
 							v-model="lists" 
 							delay-on-touch-only="true"
@@ -39,6 +39,12 @@
 									</div>
 								</transition-group>
 							</draggable>
+						</div>
+						
+					</transition>
+					<transition name="fade">
+						<div v-if="!isLoading && lists==null">
+							<p>No Lists, Please create one Using the button below.</p>
 						</div>
 					</transition>
 					

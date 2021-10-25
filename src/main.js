@@ -4,9 +4,10 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VEager from '@kuroski/v-eager'
-axios.defaults.baseURL = 'https://david-cary.com/api/3/'
+// axios.defaults.baseURL = 'https://dev.david-cary.com/api/3/' //dev
+// axios.defaults.baseURL = 'https://david-cary.com/api/3/' //production
 // axios.defaults.baseURL = 'http://localhost/api'
-// axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+axios.defaults.baseURL = process.env.VUE_APP_BASE_URL;
 
 
 

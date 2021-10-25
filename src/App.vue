@@ -55,6 +55,7 @@ export default {
 		this.$store.dispatch('getFriendRequests');
 		this.refreshData();		
 		// console.log(this.$store.getters.authGetter)
+		// console.log(process.env.VUE_APP_BASE_URL);
 	},
 	computed: {
 		isLoggedIn(){

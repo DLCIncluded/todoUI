@@ -18,11 +18,11 @@ export default createStore({
 				// 	message: "There was an error",
 				// 	id: '0000',
 				// },
-				{
-					type: "success",
-					message: "This is a long success message, to test the notifications panel. This is a long success message, to test the notifications panel",
-					id: '1111',
-				}
+				// {
+				// 	type: "success",
+				// 	message: "This is a long success message, to test the notifications panel. This is a long success message, to test the notifications panel",
+				// 	id: '1111',
+				// }
 			]
 		}
   },

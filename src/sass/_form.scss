@@ -118,3 +118,11 @@ input:checked + .slider:before {
   .slider.round:before {
 	border-radius: 50%;
   }
+
+.requirements {
+	cursor:pointer;
+	&>ul>li {
+	list-style-type: '- ';
+	margin-left: 1em;
+	}
+}
