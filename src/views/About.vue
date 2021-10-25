@@ -39,8 +39,8 @@
 					<transition name="fade">
 						<div v-if="show">Show Me</div>
 					</transition>
-
-					<button @click="test"> test notification</button> -->
+-->
+					<button @click="test"> test notification</button> 
 				</div>
 			</div>
 		</div>
@@ -66,15 +66,3 @@ export default {
 	}
 }
 </script>
-
-<style>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

@@ -6,6 +6,7 @@
 	<h2>Todo App</h2>
 	<input type="checkbox" v-model="showNav" name="nav-toggle" id="nav-toggle" class="nav-toggle">
 	<div class="nav" @click="showNav=false;forceRoute()">
+		<div class="nav-item" v-if="isLoggedIn">Welcome {{username}}</div>
 		<div class="nav-item"><router-link to="/">Home</router-link></div>
 		<div class="nav-item"><router-link to="/about">About</router-link></div>
 		<div class="nav-item"><router-link to="/lists">Lists</router-link></div>
@@ -22,7 +23,18 @@
   <router-view/>
   
 <notifications-panel></notifications-panel>
-
+<div class="list-nav" v-if="page!='Lists'">
+	<div>
+		<i class="fas fa-users fa-2x" @click="this.$router.push('/friends')"></i>
+	</div>
+	<div>
+		
+	</div>
+	
+	<div>
+		<i class="fas fa-list-ul fa-2x" @click="this.$router.push('/lists')"></i>
+	</div>
+</div>
 </template>
 
 <script>
@@ -41,6 +53,12 @@ export default {
 	computed: {
 		isLoggedIn(){
 			return this.$store.getters.authGetter
+		},
+		username(){
+			return this.$store.getters.userGetter
+		},
+		page(){
+			return this.$route.name;
 		}
 	},
 	methods: {
@@ -49,7 +67,7 @@ export default {
 		},
 		forceRoute() {
 			this.$store.dispatch('setForceRoute');
-		}
+		},
 	},
 	components:{
 		NotificationsPanel

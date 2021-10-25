@@ -3,7 +3,7 @@
 		<div class="notification" :class="notification.type" v-if="show">
 			{{notification.message}}
 			<div class="status-bar"></div>
-			<div class="close" @click="close"><i class="fas fa-times-circle"></i></div>
+			<div class="close" @click="close"><i class="fas fa-times-circle fa-2x"></i></div>
 		</div>
 	</transition>
 </template>
@@ -20,12 +20,12 @@ export default {
 		}
 	},
 	created() {
-		this.timeout = setTimeout(() =>{
-			this.show = false;
-			this.timeout = setTimeout(()=>{
-				this.removeNotification(this.notification);	
+		var v=this;
+		v.timeout = setTimeout(() =>{
+			v.show = false;
+			v.timeout = setTimeout(()=>{
+				v.removeNotification(v.notification);	
 			},250)
-			// this.removeNotification(this.notification);
 		},3000)
 	},
 	beforeUnmount() {
@@ -34,9 +34,11 @@ export default {
 	methods: {
 		...mapActions(['removeNotification']),
 		close(){
-			this.show = false;
-			this.timeout = setTimeout(()=>{
-				this.removeNotification(this.notification);	
+			console.log(this.notification)
+			var v=this;
+			v.show = false;
+			v.timeout = setTimeout(()=>{
+				v.removeNotification(v.notification);	
 			},250)
 		}
 	}

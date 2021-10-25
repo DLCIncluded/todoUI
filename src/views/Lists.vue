@@ -1,216 +1,256 @@
 <template>
+
 <div class="container">
-	<div class="card" :class="[listActive ? 'not-active-left' : '',showNewListPrompt ? 'not-active-left' : '',showEditListPrompt ? 'not-active-left' : '']">
-		<div class="card-head" >
-			<h1>Your Lists</h1>
-			<i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewListPrompt=true;currentPage='newList'"></i>
-		</div>
-		<div class="card-body">
-			<div :class="isLoading ? '' : 'not-active'">
-				<div class="spinner">
-					<div></div><div></div><div></div><div></div>
+	<!-- <div class="card-container" :class="[listActive ? 'not-active-left' : '',showNewListPrompt ? 'not-active-left' : '',showEditListPrompt ? 'not-active-left' : '']"> -->
+	<transition :name="listsTransition">
+		<div class="card-container" v-if="currentPage=='lists'">
+			<div class="card">
+				<div class="card-head" >
+					<h1>Your Lists</h1>
+					<!-- <i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewListPrompt=true;currentPage='newList'"></i> -->
 				</div>
-			</div>
-			
-			
-			<div :class="isLoading ? 'not-active' : ''">	
-				<draggable 
-				v-model="lists" 
-				delay-on-touch-only="true"
-				delay="100"
-				@start="drag=true" 
-				@end="drag=false;saveOrderList()" 
-				ghost-class="ghost"
-				item-key="id">
-					<transition-group>
-						<div class="list-item cursor-pointer flex-between" v-for="list in lists" :key="list.id" @click="currentPage='todoList';showList(list.id, list.name, list.owner, list.description);showLoader()">
-							<p>{{list.name}}</p>
-							<div>
-								<i class="fas fa-trash-alt trash" @click.stop="trashclicked=true;trash(list.id, list.name, 'list');currentPage='deleteList'"></i>
-								<i class="back-button fas fa-chevron-circle-right"></i>
+				<div class="card-body">
+					<transition name="fade">
+						<!-- <div :class="isLoading ? '' : 'not-active'"> -->
+						<div v-if="isLoading">
+							<div class="spinner">
+								<div></div><div></div><div></div><div></div>
 							</div>
 						</div>
-					</transition-group>
-				</draggable>
-			</div>
-			
-		</div>
-	</div>
-
-	<div class="card"  :class="[listActive ? '' : 'not-active-right', showNewTodoPrompt ? 'not-active-left' : '']">
-		
-		<div class="card-head">
-			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false;currentPage='lists'"></i>
-			<div style="text-align:center;">
-				<h2>{{currentList}}</h2>
-				<p>{{currentListDescription}}</p>
-			</div>
-			<div>
-				<i class="edit-button far fa-edit fa-2x" @click="editCurrentList(currentListId);currentPage='editList'"></i>
-				<i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true;currentPage='newTodo'"></i>
-			</div>
-			
-		</div>
-		<div class="card-body">
-			<div :class="isLoading ? '' : 'not-active'">
-				<div class="spinner">
-					<div></div><div></div><div></div><div></div>
+					</transition>
+					<transition name="fade">
+						<!-- <div :class="isLoading ? 'not-active' : ''">	 -->
+						<div v-if="!isLoading">	
+							<draggable 
+							v-model="lists" 
+							delay-on-touch-only="true"
+							delay="100"
+							@start="drag=true" 
+							@end="drag=false;saveOrderList()" 
+							ghost-class="ghost"
+							item-key="id">
+								<transition-group>
+									<div class="list-item cursor-pointer flex-between" v-for="list in lists" :key="list.id" @click="setPage('todoList');showList(list.id, list.name, list.owner, list.description);showLoader()">
+										<p>{{list.name}}</p>
+										<div>
+											<i class="fas fa-trash-alt trash" @click.stop="trashclicked=true;trash(list.id, list.name, 'list');showDeletePrompt=true"></i>
+											<i class="back-button fas fa-chevron-circle-right"></i>
+										</div>
+									</div>
+								</transition-group>
+							</draggable>
+						</div>
+					</transition>
+					
 				</div>
 			</div>
-
-
-			<div class="list-item cursor-pointer flex-between" v-if="isLoading==false && todos==null" @click="showNewTodoPrompt=true;currentPage='newTodo'">
-				<p >No items found, please create one!</p>
-			</div>
-
-			<div :class="isLoading ? 'not-active' : 'is-active'">
-				<draggable 
-				v-model="todos" 
-				delay-on-touch-only="true"
-				delay="100"
-				@start="drag=true" 
-				@end="drag=false;saveOrderTodo()" 
-				ghost-class="ghost"
-				item-key="id">
-					<transition-group>
-						<div class="list-item cursor-pointer flex-between" v-for="todo in todos" :key="todo.id" @click="markDone(todo.id)" :class="todo.done==0 ? '' : 'done'">
-							<p>{{todo.name}}</p>
-							<div>
-								<i class="fas fa-trash-alt trash" @click.stop="trash(todo.id, todo.name, 'todo');currentPage='deleteTodo'"></i>
-								<i class="far fa-check-circle primary" v-if="todo.done==1"></i>
-								<i class="far fa-circle primary" v-else></i>
+		</div>
+	</transition>
+	
+	<!-- <div class="card-container" :class="[listActive ? '' : 'not-active-right', showNewTodoPrompt ? 'not-active-left' : '']"> -->
+	<transition :name="todosTransition">
+		<div class="card-container" v-if="currentPage=='todoList'">
+			<div class="card">
+				
+				<div class="card-head">
+					<!-- <i class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false;currentPage='lists'"></i> -->
+					<!-- <div class="flex-between"> -->
+						<h2>{{currentList}}</h2>
+						<p>{{currentListDescription}}</p>
+					<!-- </div> -->
+					<div>
+						<!-- <i class="edit-button far fa-edit fa-2x" @click="editCurrentList(currentListId);currentPage='editList'"></i> -->
+						<!-- <i class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true;currentPage='newTodo'"></i> -->
+					</div>
+					
+				</div>
+				<div class="card-body">
+					<transition name="fade">
+						<!-- <div :class="isLoading ? '' : 'not-active'"> -->
+						<div v-if="isLoading">
+							<div class="spinner">
+								<div></div><div></div><div></div><div></div>
 							</div>
 						</div>
-					</transition-group>
-				</draggable>
-				<div v-if="showDeleteAll" class="list-item cursor-pointer" style="text-align:center; margin-top:1em" @click.prevent="showDeleteAllPrompt = true;currentPage='deleteAll' ">Delete all completed</div>
-				<!-- <div class="list-item" v-for="todo in todos" :key="todo.id">{{todo.name}}</div> -->
-			</div>
-			
-		</div>
-	</div>
+					</transition>
 
-	<div class="card"  :class="showNewListPrompt ? '' : 'not-active-right'">
-		
-		<div class="card-head">
-			<h2>Create New List</h2>
-			<i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewListPrompt=false;currentPage='lists'"></i>
-		</div>
-		<div class="card-body">
-			<div>
-				<form @submit.prevent="newList()">
-					<div class="input-group">
-						<input type="text" name="list-name" v-model="newListName" placeholder="List Name" autocomplete="off" :disabled="!showNewListPrompt" :style="showNewListPrompt ? '':'cursor:unset'"/>
+					
+					<div class="list-item cursor-pointer flex-between" v-if="isLoading==false && todos==null" @click="setPage('newTodo')">
+						<p >No items found, please create one!</p>
 					</div>
-					<div class="input-group">
-						<input type="text" v-model="newListDescription" name="description" placeholder="List Description(optional)" autocomplete="off" :disabled="!showNewListPrompt" :style="showNewListPrompt ? '':'cursor:unset'" />
-					</div>
-					<div class="input-group">
-						<input type="submit" name="submit" :disabled="!showNewListPrompt" :style="showNewListPrompt ? '':'cursor:unset'"/>
-					</div>
-				</form>
-			</div>
-			
-		</div>
-	</div>
 
-	<div class="card"  :class="showNewTodoPrompt ? '' : 'not-active-right'">
-		
-		<div class="card-head">
-			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i>
-			<h2>New Todo</h2>
-			<i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i>
-		</div>
-		<div class="card-body">
-			<div>
-				<form @submit.prevent="newTodo();currentPage='todoList'">
-					<div class="input-group">
-						<input type="text" name="todo-name" v-model="newTodoName" placeholder="Todo Name" autocomplete="off" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'"/>
-					</div>
-					<div class="input-group">
-						<!-- <input type="text" v-model="newListDescription" name="description" placeholder="List Description(optional)" autocomplete="off" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'" /> -->
-						<select v-model="newTodoType" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'">
-							<option value="1">No Repeat</option>
-							<option value="2">Daily</option>
-							<option value="3">weekly</option>
-						</select>
-					</div>
-					<div class="input-group">
-						<input type="submit" name="submit" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'"/>
-					</div>
-					<label class="switch">
-						<input type="checkbox" v-model="stayOnPage">
-						<span class="slider"></span>
-					</label>
-					<span style="font-size:1.2em;cursor:pointer" @click="stayOnPage=!stayOnPage">Stay on page?</span>
-				</form>
+					<transition name="fade">
+						<!-- <div :class="isLoading ? 'not-active' : ''">	 -->
+						<div v-if="!isLoading">	
+							<draggable 
+							v-model="todos" 
+							delay-on-touch-only="true"
+							delay="100"
+							@start="drag=true" 
+							@end="drag=false;saveOrderTodo()" 
+							ghost-class="ghost"
+							item-key="id">
+								<transition-group>
+									<div class="list-item cursor-pointer flex-between" v-for="todo in todos" :key="todo.id" @click="markDone(todo.id);todo.done=1" :class="todo.done==0 ? '' : 'done'">
+											<!-- set todo.done=1 on click to avoid the delay on sending the update to the server and waiting on the list to re-render -->
+										<p>{{todo.name}}</p>
+										<div>
+											<i class="fas fa-trash-alt trash" @click.stop="trash(todo.id, todo.name, 'todo');showDeletePrompt=true"></i>
+											<i class="far fa-check-circle primary" v-if="todo.done==1"></i>
+											<i class="far fa-circle primary" v-else></i>
+										</div>
+									</div>
+								</transition-group>
+							</draggable>
+							<div v-if="showDeleteAll" class="list-item cursor-pointer" style="text-align:center; margin-top:1em" @click.prevent="showDeleteAllPrompt=true">Delete all completed</div>
+							<!-- <div class="list-item" v-for="todo in todos" :key="todo.id">{{todo.name}}</div> -->
+						</div>
+					</transition>
+				</div>
 			</div>
-			
 		</div>
-	</div>
+	</transition>
 
-	<div class="card"  :class="showEditListPrompt ? '' : 'not-active-right'">
-		
-		<div class="card-head">
-			<i class="back-button fas fa-chevron-circle-left fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='lists'"></i>
-			<h2>Edit List</h2>
-			<i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewTodoPrompt=false;currentPage='lists'"></i>
+	<!-- <div class="card"  :class="showNewListPrompt ? '' : 'not-active-right'"> -->
+	<transition name="not-active-right">
+		<div class="card-container" v-if="showNewListPrompt">
+			<div class="card">
+				<div class="card-head">
+					<h2>Create New List</h2>
+					<!-- <i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewListPrompt=false;currentPage='lists'"></i> -->
+				</div>
+				<div class="card-body">
+					<div>
+						<form @submit.prevent="newList();">
+							<div class="input-group">
+								<input type="text" name="list-name" v-model="newListName" placeholder="List Name" autocomplete="off" />
+							</div>
+							<div class="input-group">
+								<input type="text" v-model="newListDescription" name="description" placeholder="List Description(optional)" autocomplete="off" />
+							</div>
+							<div class="input-group">
+								<button type="submit" name="submit">Save</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="card-body">
-			<div>
-				<form @submit.prevent="editList();currentPage='lists'">
-					<div class="input-group">
-						List Name: <input type="text" name="list-name" v-model="currentList" placeholder="List Name" autocomplete="off" />
+	</transition>
+
+	<!-- <div class="card"  :class="showNewTodoPrompt ? '' : 'not-active-right'"> -->
+	<transition name="not-active-right">
+		<div class="card-container" v-if="currentPage=='newTodo'">
+			<div class="card">
+				
+				<div class="card-head">
+					<!-- <i class="back-button fas fa-chevron-circle-left fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i> -->
+					<h2>New Todo</h2>
+					<!-- <i class="cancel-btn fas fa-times-circle fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i> -->
+				</div>
+				<div class="card-body">
+					<div>
+						<form @submit.prevent="newTodo();">
+							<div class="input-group">
+								<input type="text" name="todo-name" v-model="newTodoName" placeholder="Todo Name" autocomplete="off"/>
+							</div>
+							<div class="input-group">
+								<!-- <input type="text" v-model="newListDescription" name="description" placeholder="List Description(optional)" autocomplete="off" :disabled="!showNewTodoPrompt" :style="showNewTodoPrompt ? '':'cursor:unset'" /> -->
+								<select v-model="newTodoType">
+									<option value="1">No Repeat</option>
+									<option value="2">Daily</option>
+									<option value="3">weekly</option>
+								</select>
+							</div>
+							<div class="input-group">
+								<button type="submit" name="submit">Save</button>
+							</div>
+							<label class="switch">
+								<input type="checkbox" v-model="stayOnPage">
+								<span class="slider"></span>
+							</label>
+							<span style="font-size:1.2em;cursor:pointer" @click="stayOnPage=!stayOnPage">Stay on page?</span>
+						</form>
 					</div>
-					<div class="input-group">
-						Description: <input type="text" v-model="currentListDescription" name="description" placeholder="List Description" autocomplete="off" />
-					</div>
-					<div class="input-group">
-						<input type="submit" name="submit" />
-					</div>
-				</form>
-			</div>			
+				</div>
+			</div>
 		</div>
-		<div class="card-body" >
-			<div v-if="listOwner">
-				Share with a friend:
+	</transition>
+
+	<!-- <div class="card-container" :class="showEditListPrompt ? '' : 'not-active-right'"> -->
+	<transition name="not-active-right">
+	<div class="card-container" v-if="currentPage=='editList'">
+		<div class="card">
+			<div class="card-head">
+				<!-- <i class="back-button fas fa-chevron-circle-left fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
+				<h2>Edit List</h2>
+				<!-- <i class="cancel-btn fas fa-times-circle fa-2x" @click="showEditListPrompt=false;listActive=true;currentPage='todoList'"></i> -->
+			</div>
+			<div class="card-body">
+				<div>
+					<form @submit.prevent="editList();setPage('todoList')">
+						<div class="input-group">
+							List Name: <input type="text" name="list-name" v-model="currentList" placeholder="List Name" autocomplete="off" />
+						</div>
+						<div class="input-group">
+							Description: <input type="text" v-model="currentListDescription" name="description" placeholder="List Description" autocomplete="off" />
+						</div>
+						<div class="input-group">
+							<button type="submit" name="submit">Save</button>
+						</div>
+					</form>
+				</div>			
+			</div>
+			<div class="card-body" >
+				<div v-if="listOwner">
+					Share with a friend:
+						<transition name="fade">
+							<!-- <div :class="isLoading ? '' : 'not-active'"> -->
+							<div v-if="isLoading">
+								<div class="spinner">
+									<div></div><div></div><div></div><div></div>
+								</div>
+							</div>
+						</transition>
+						<ul class="friends">
+							
+							<li v-if="!friends || friends.length == 0">
+								No friends to share with.
+							</li>
+							<li v-else v-for="friend in friends" :key="friend.id" class="friend-item" @click="shareList(friend.user_id)">
+								<i class="fas fa-external-link-alt"></i> {{friend.username}}
+							</li>
+						</ul>
+				</div>		
+				<div v-else>
+					You don't Own this list, but you can remove it from your list:
+
 					<ul class="friends">
-						<li v-if="!friends">
-							You do not have any friends.
-						</li>
-						<li v-else v-for="friend in friends" :key="friend.id" class="friend-item" @click="shareList(friend.user_id)">
-							<i class="fas fa-external-link-alt"></i> {{friend.username}}
+						
+						<li @click="removeList()" class="cursor-pointer">
+							<i class="far fa-trash-alt"></i> Remove List
 						</li>
 					</ul>
-			</div>		
-			<div v-else>
-				You don't Own this list, but you can remove it from your list:
-
+				</div>	
+			</div>
+			<div class="card-body">
+				Users with Access:
+				
 				<ul class="friends">
-					<li @click="removeList()" class="cursor-pointer">
-						<i class="far fa-trash-alt"></i> Remove List
+					<li v-if="!currentAccess">
+						No one has access but you.
+					</li>
+					<li v-else v-for="user in currentAccess" :key="user.id" class="friend-item">
+						<i class="fas fa-external-link-alt"></i> {{user.username}} - <span @click="removeList(user.id)">Remove</span>
 					</li>
 				</ul>
-			</div>	
-		</div>
-		<div class="card-body">
-			Users with Access:
-			<ul class="friends">
-				<li v-if="!currentAccess">
-					No one has access but you.
-				</li>
-				<li v-else v-for="user in currentAccess" :key="user.id" class="friend-item">
-					<i class="fas fa-external-link-alt"></i> {{user.username}} - <span @click="removeList(user.id)">Remove</span>
-				</li>
-			</ul>
+			</div>
 		</div>
 	</div>
-	
-
-	
+	</transition>
 </div>
-
-<div class="popup-container" :class="showDeletePrompt ? '' : 'hidden'">
+<transition name="fade">
+<div class="popup-container" v-if="showDeletePrompt">
 	<div class="popup-backdrop"></div>
 	<div class="popup card active">
 		<div class="card-head">
@@ -220,18 +260,19 @@
 			<p>Are you sure you wish to delete "{{currentlyDeleting}}"</p>
 			<div class="flex-fill">
 
-				<div v-if="currentlyDeletingType == 'list'" class="btn cancel" @click.prevent="this.showDeletePrompt=false;currentPage='lists'"><i class="fas fa-times-circle"></i> Cancel</div>
-				<div v-else class="btn cancel" @click.prevent="this.showDeletePrompt=false;currentPage='todoList'"><i class="fas fa-times-circle"></i> Cancel</div>
+				<div v-if="currentlyDeletingType == 'list'" class="btn cancel" @click.prevent="showDeletePrompt=false;setPage('lists')"><i class="fas fa-times-circle"></i> Cancel</div>
+				<div v-else class="btn cancel" @click.prevent="this.showDeletePrompt=false;setPage('todoList')"><i class="fas fa-times-circle"></i> Cancel</div>
 				<!-- STUPID navigation hack -->
-				<div v-if="currentlyDeletingType == 'list'" class="btn confirm" @click.prevent="deleteItem();currentPage='lists'"><i class="fas fa-trash-alt"></i> Delete</div>
-				<div v-else class="btn confirm" @click.prevent="deleteItem();currentPage='todoList'"><i class="fas fa-trash-alt"></i> Delete</div>
+				<div v-if="currentlyDeletingType == 'list'" class="btn confirm" @click.prevent="deleteItem();setPage('lists')"><i class="fas fa-trash-alt"></i> Delete</div>
+				<div v-else class="btn confirm" @click.prevent="deleteItem();setPage('todoList')"><i class="fas fa-trash-alt"></i> Delete</div>
 			</div>
 			
 		</div>
 	</div>
 </div>
-
-<div class="popup-container" :class="showDeleteAllPrompt ? '' : 'hidden'">
+</transition>
+<transition name="fade">
+<div class="popup-container" v-if="showDeleteAllPrompt">
 	<div class="popup-backdrop"></div>
 	<div class="popup card active">
 		<div class="card-head">
@@ -240,20 +281,40 @@
 		<div class="card-body">
 			<p>Are you sure you wish to delete all completed items from "{{currentList}}"</p>
 			<div class="flex-fill">
-				<div class="btn cancel" @click.prevent="this.showDeleteAllPrompt=false;currentPage='todoList'"><i class="fas fa-times-circle"></i> Cancel</div>
-				<div class="btn confirm" @click.prevent="deleteCompleted(currentListId);currentPage='todoList'"><i class="fas fa-trash-alt"></i> Delete</div>
+				<div class="btn cancel" @click.prevent="showDeleteAllPrompt=false;setPage('todoList')"><i class="fas fa-times-circle"></i> Cancel</div>
+				<div class="btn confirm" @click.prevent="deleteCompleted(currentListId);setPage('todoList')"><i class="fas fa-trash-alt"></i> Delete</div>
 			</div>
-			
 		</div>
 	</div>
 </div>
-
+</transition>
 
 
 <!-- <div class="bottom-nav">
 	{{this.currentPage}}
 	<div @click.prevent="back()"><i class="fas fa-backward"></i> Back</div>
 </div> -->
+
+
+<div class="list-nav">
+	<div>
+		<i v-if="currentPage=='todoList'" class="back-button fas fa-chevron-circle-left fa-2x" @click="this.listActive=false;setPage('lists')"></i>
+	</div>
+	<div>
+		<!-- <i v-if="currentPage=='newTodo'" class="back-button fas fa-chevron-circle-left fa-2x" @click="showNewTodoPrompt=false;currentPage='todoList'"></i> -->
+		<i v-if="currentPage=='newTodo'" class="cancel-btn fas fa-times-circle fa-2x" @click="showNewTodoPrompt=false;setPage('todoList')"></i>
+		<i v-if="currentPage=='lists'" class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewListPrompt=true;setPage('newList')"></i>
+		<i v-if="currentPage=='newList'" class="cancel-btn fas fa-times-circle fa-2x" @click="showNewListPrompt=false;setPage('lists')"></i>
+		<i v-if="currentPage=='editList'" class="cancel-btn fas fa-times-circle fa-2x" @click="showEditListPrompt=false;listActive=true;setPage('todoList')"></i>
+		<i v-if="currentPage=='todoList'" class="edit-button far fa-edit fa-2x" @click="editCurrentList(currentListId);setPage('editList')"></i>
+	</div>
+	
+	<div>
+		<i v-if="currentPage=='todoList'" class="create-new-btn fas fa-plus-circle fa-2x" @click="showNewTodoPrompt=true;setPage('newTodo')"></i>
+	</div>
+</div>
+
+<!-- current: {{currentPage}} - previous: {{previousPage}} -->
 </template>
 
 <script>
@@ -288,6 +349,7 @@ export default {
 			currentlyDeletingType: null,
 			stayOnPage: null,
 			currentPage: 'lists',
+			previousPage: 'lists',
 			friends:null,
 			currentAccess:null,
 			timer: null,
@@ -297,47 +359,45 @@ export default {
         draggable: VueDraggableNext,
     },
 	methods: {
-		test(){
-			console.log("test");
-
-		},
 		back(){
 			//weird nav issues
 			// fixes the back button for navigation inside the list page
-			// console.log("backbtn pressed")
-			// console.log("current page: "+this.currentPage)
 			if(this.currentPage == 'lists') {
-				console.log("current page: lists")
+				console.log("current page: lists");
 			}
 			if(this.currentPage == 'todoList'){
 				this.listActive=false;
-				this.currentPage = "lists"
+				this.setPage("lists");
 			}
 			if(this.currentPage == 'newList'){
 				this.showNewListPrompt = false;
-				this.currentPage = "lists"
+				this.setPage("lists");
 			}
 			if(this.currentPage == 'newTodo'){
 				this.showNewTodoPrompt = false;
-				this.currentPage = "todoList"
+				this.setPage("todoList");
 			}
 			if(this.currentPage == 'editList'){
-				this.currentPage = "todoList"
+				this.setPage("todoList");
 				this.showEditListPrompt=false;
 				this.listActive=true;
 			}
 			if(this.currentPage == 'deleteAll') {
-				this.currentPage = "todoList";
+				this.setPage("todoList");
 				this.showDeleteAllPrompt=false;
 			}
 			if(this.currentPage == 'deleteList') {
-				this.currentPage = "lists";
+				this.setPage("lists");
 				this.showDeletePrompt=false;
 			}
 			if(this.currentPage == 'deleteTodo') {
-				this.currentPage = "todoList";
+				this.setPage("todoList");
 				this.showDeletePrompt=false;
 			}
+		},
+		setPage(page){
+			this.previousPage=this.currentPage;
+			this.currentPage=page;
 		},
 		trash(id, name, type){
 			var v = this;
@@ -345,10 +405,6 @@ export default {
 			v.currentlyDeleting = name;
 			v.currentlyDeletingId = id;
 			v.currentlyDeletingType = type;
-			// setTimeout(function(){
-			// 	v.trashclicked = false;
-			// }, 50); // dumb ass hack to keep the trash button from triggering the mark done
-
 		},
 		async deleteCompleted (id){
 			var v = this;
@@ -407,6 +463,7 @@ export default {
 				}else{
 					console.log(response.data);
 					v.showEditListPrompt = false;
+					v.listActive = true;
 					v.$store.dispatch('addNotification',{
 						type: "success",
 						message: response.data.message
@@ -540,6 +597,13 @@ export default {
         },
 		async newList(){
 			var v = this;
+			if(v.newListName.trim() == ''){
+				v.$store.dispatch('addNotification',{
+					type: "error",
+					message: "Sorry you must at least enter a name."
+				})
+				return;
+			}
 			await v.$store.dispatch('newList', {
 				listName: v.newListName,
 				listDescription: v.newListDescription,
@@ -549,6 +613,7 @@ export default {
 				v.showNewListPrompt = false;
 				v.isLoading = true;
 				v.getLists();
+				v.setPage('lists');
 			});
 		},
 		async newTodo(){
@@ -560,7 +625,7 @@ export default {
 			}).then(function(){
 				v.newTodoType = 1;
 				v.newTodoName = "";
-				if(!v.stayOnPage){ v.showNewTodoPrompt = false; }
+				if(!v.stayOnPage){ v.showNewTodoPrompt = false; v.setPage('todoList')}
 				v.isLoading = true;
 				v.getTodos();
 			})
@@ -658,9 +723,6 @@ export default {
             }
         },
 		async markDone(todo_id){
-			// if(this.trashclicked == true){
-			// 	return;
-			// }
 			var v = this;
 			var fd = new FormData();
 			fd.append('id', localStorage.id);
@@ -674,10 +736,7 @@ export default {
 					// v.error = response.data.message
 				}else{
 					console.log(response.data.message)
-					v.getTodos();
-					// v.todoLists = []
-					// v.todoLists = response.data.lists
-					
+					v.getTodos(false);//get todos with out showing loader
 				}
 			})
 		},
@@ -708,9 +767,10 @@ export default {
 			var fd = new FormData();
 			fd.append('id', localStorage.id);
 			fd.append('token', localStorage.token);
+			fd.append('list_id', v.currentListId);
 			this.isLoading = true;
 
-			await axios.post("server.php?action=getfriends",fd).then(function(response){
+			await axios.post("server.php?action=getfriendswithoutaccess",fd).then(function(response){
 				// console.log(response.data.lists)
 				if(response.data.error){
 					v.isLoading = false;
@@ -805,6 +865,20 @@ export default {
 		clearInterval(this.timer)
 	},
     computed: {
+		listsTransition(){
+			if(this.currentPage == 'lists' && this.previousPage == 'todoList' ){
+				return 'not-active-left';
+			}
+			return 'not-active-left';
+		},
+		todosTransition(){
+			if(this.currentPage == 'todoList' && this.previousPage == 'lists' ){
+				return 'not-active-right';
+			}else if(this.currentPage == 'lists' && this.previousPage == 'todoList'){
+				return 'not-active-right';
+			}
+			return 'not-active-left';
+		},
 		listOwner() {
 			if(localStorage.username == this.currentListOwner) {
 				return true;

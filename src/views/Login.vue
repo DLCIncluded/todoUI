@@ -21,7 +21,7 @@
 					</div>
 					<div class="input-group">
 						<!-- <h3>Password</h3>  -->
-						<input type="submit" name="submit"/>
+						<button type="submit" name="submit">Login</button>
 					</div>
 				</form>
 				<div class="input-group">
@@ -60,7 +60,7 @@
 						<input type="password" v-model="newPasswordRepeat" name="newPasswordRepeat" placeholder="Repeat New Password"/>
 					</div>
 					<div class="input-group">
-						<input type="submit" name="submit"/>
+						<button type="submit" name="submit">Reset Password</button>
 					</div>
 				</form>
 				<div class="input-group">

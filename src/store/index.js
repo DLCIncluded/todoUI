@@ -8,10 +8,17 @@ export default createStore({
 		return {
 			loggedIn: false,
 			forceRouter: false,
+			username: null,
 			notifications: [
 				// {
 				// 	type: "error",
-				// 	message: "There was an error"
+				// 	message: "There was an error",
+				// 	id: '0000',
+				// },
+				// {
+				// 	type: "success",
+				// 	message: "Successfully did something",
+				// 	id: '1111',
 				// }
 			]
 		}
@@ -19,6 +26,9 @@ export default createStore({
   mutations: {
 	setAuth(state,msg){
         state.loggedIn = msg;
+    },
+	setUser(state,user){
+        state.username = user;
     },
 	PUSH_NOTIFICATION(state,notification){
 		state.notifications.push({
@@ -47,6 +57,9 @@ export default createStore({
 	forceRouterGetter(state){
         return state.forceRouter;
     },
+	userGetter(state){
+		return state.username;
+	}
   },
   actions: {
 	addNotification({commit}, notification){
@@ -136,6 +149,7 @@ export default createStore({
                 // localStorage.expires = response.data.expires;
                 
                 commit('setAuth', true)//need to set the state loggedIn variable as true
+				commit('setUser',response.data.username);
 				
                 // // commit('setSuccess', "Logged in successfully")
                 dispatch('addNotification', {

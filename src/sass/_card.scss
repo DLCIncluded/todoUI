@@ -1,6 +1,15 @@
-.card {
-	width: 95%;
+.card-container {
 	position: absolute;
+	width: 100%;
+	padding-bottom: 5em;
+	padding-left: auto;
+	padding-left: auto;
+}
+
+.card {
+	width: 98%;
+	// left:.6em;
+	position: relative;
 	margin-left: auto;
 	margin-right: auto;
 
@@ -30,15 +39,23 @@
 	
 
 	&-head {
-		display:flex;
-		justify-content: space-between;
+		// display:flex;
+		// align-items: flex-end;
+		// justify-content: space-between;
 
 		background-color: $card-head-color;
 		padding: 1em;
 
 		border-top-left-radius: .5em;
 		border-top-right-radius: .5em;
-
+		&>h2 {
+			line-height: 1;
+		}
+		&>p {
+			line-height: 1;
+			margin-top:.2em;
+			margin-left: .3em;
+		}
 		
 		
 	}
@@ -55,14 +72,6 @@
 		margin-right:.5em;
 		color:$color-primary;	
 		cursor: pointer;
-	}
-
-	.cancel-btn {
-		margin-top:auto;
-		margin-bottom: auto;
-		margin-right:.3em;
-		color: $imperial-red;	
-		cursor: pointer;	
 	}
 
 	.back-button {

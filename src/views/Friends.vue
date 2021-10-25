@@ -9,7 +9,7 @@
 					Friends: {{friendReqUsername}}
 					<ul>
 						<li v-if="!friends">No Friends</li>
-						<li v-for="friend in friends" :key="friend.id">{{friend.username}} - <i class="fas fa-user-times  cursor-pointer error-text" @click.prevent="showDeletePrompt=true;toDeleteId=friend.id"></i></li>
+						<li v-for="friend in friends" :key="friend.id"><span>{{friend.username}}</span> <i class="fas fa-user-times  cursor-pointer error-text" @click.prevent="showDeletePrompt=true;toDeleteId=friend.id"> Remove Friend</i></li>
 					</ul>	
 
 				</div>
@@ -20,12 +20,13 @@
 				<form @submit.prevent="friendRequest" autocomplete="off">
 					<p>Please enter the username of the person you would like to send a friend request to:</p><br>
 					<div class="input-group">
-						<input type="text" name="request" autocomplete="off" placeholder="Username" :value='friendReqUsername' @input='evt=>friendReqUsername=evt.target.value' @keyup="checkUsername(friendReqUsername)" @blur="checkUsername(friendReqUsername)"/>
+						<input type="text" class="username-check" name="request" autocomplete="off" placeholder="Username" :value='friendReqUsername' @input='evt=>friendReqUsername=evt.target.value' @keyup="checkUsername(friendReqUsername)" @blur="checkUsername(friendReqUsername)"/>
 						<i class="fas fa-user-times error-text" v-if="!userExists"></i>
 						<i class="fas fa-user-check success-text" v-else></i>
 					</div>
 					<div class="input-group">
-						<input type="submit" name="submit"/>
+						<!-- <input type="submit" name="submit"/> -->
+						<button type="submit" name="submit">Send Request</button>
 					</div>
 				</form>
 			</div>
@@ -36,9 +37,9 @@
 					<ul>
 						<li v-if="!friendRequests">No Requests</li>
 						<li v-for="request in friendRequests" :key="request.id">
-							<i class="fas fa-user-check cursor-pointer success-text" @click.prevent="acceptRequest(request.id)"></i> &nbsp; 
-							<i class="fas fa-user-times  cursor-pointer error-text" @click.prevent="declineRequest(request.id)"></i> -
-							{{request.username}}
+							<span>{{request.username}}</span>
+							<i class="fas fa-user-check cursor-pointer success-text" @click.prevent="acceptRequest(request.id)"> Accept</i>
+							<i class="fas fa-user-times  cursor-pointer error-text" @click.prevent="declineRequest(request.id)"> Decline</i>
 						</li>
 					</ul>
 				</div>
@@ -50,9 +51,8 @@
 					<ul class="friends">
 						<li v-if="!sentRequests">No Requests</li>
 						<li v-for="request in sentRequests" :key="request.id">
-							<i class="fas fa-trash-alt cursor-pointer error-text" @click.prevent="deleteRequest(request.id)"></i>  &nbsp; 
-							{{request.username}}
-							
+							<span>{{request.username}}</span>
+							<i class="fas fa-trash-alt cursor-pointer error-text" @click.prevent="deleteRequest(request.id)"> Delete Request</i>
 						</li>
 					</ul>
 			</div>
