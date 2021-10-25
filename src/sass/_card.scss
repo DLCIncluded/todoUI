@@ -99,6 +99,9 @@
 		box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.1);
 		border-radius: 5px;
 		font-size: 1.5em;
+		&>div{
+			display: flex;
+		}
 
 		&:hover {
 			box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);

@@ -1,6 +1,6 @@
 <template>
-
-		<div class="friends-container">
+<div class="container"></div>
+		<div class="card-container friends-container">
 			<div class="card">
 				<div class="card-head" >
 					<h3>Friends</h3>
@@ -48,7 +48,7 @@
 			<div class="card">
 				<div class="card-head"><h3>Sent Requests (pending):</h3></div>
 				<div class="card-body">
-					<ul class="friends">
+					<ul>
 						<li v-if="!sentRequests">No Requests</li>
 						<li v-for="request in sentRequests" :key="request.id">
 							<span>{{request.username}}</span>

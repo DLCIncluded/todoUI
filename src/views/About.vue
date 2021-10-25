@@ -1,5 +1,6 @@
 <template>
-		<div class="container">
+<div class="container"></div>
+		<div class="card-container">
 		<div class="card">
 			<div class="card-head" >
 				<h1>About</h1>
@@ -18,7 +19,6 @@
 								<li>Non-repeating</li>
 								<li>Daily(Should Work)</li>
 								<li>Weekly(Should Work)</li>
-								<li>Monthly(WIP)</li>
 								<li>More possibly in the future</li>
 							</ul>
 						<li>Delete All Completed ToDos (done)</li>
@@ -35,17 +35,21 @@
 						<li>Organize lists/todos by drag and dropping (done)</li>
 							<ul style="margin-left:2em">
 								<li>FYI On mobile you have to hold for at least .2sec before dragging</li>
+								<li>Note on sorting: Lists will sort however you want, but list items are shared with everyone.</li>
+								<li>This means if you order your lists, it will not affect anyone else, but if you order list items/todos, it affects that list and everyone who has access will see those changes</li>
 							</ul>
 
 					</ul>
 
-					<!-- <button @click="show = !show">Test</button>
+					<!-- 
+					<button @click="show = !show">Test</button>
 
 					<transition name="fade">
 						<div v-if="show">Show Me</div>
 					</transition>
--->
-					<button @click="test"> test notification</button> 
+					-->
+
+					<!-- <button @click="test"> test notification</button>  -->
 				</div>
 			</div>
 		</div>

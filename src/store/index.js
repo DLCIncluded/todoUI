@@ -197,6 +197,7 @@ export default createStore({
                     console.log("token valid");
                     // console.log(response.data)                        
                     commit('setAuth', true)
+					commit('setUser',localStorage.username);
                     // commit('changeCheckingAuth', false)
                 }
                 
