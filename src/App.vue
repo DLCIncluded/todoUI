@@ -3,7 +3,7 @@
 	<i class="fas fa-chevron-circle-down" ></i>Menu
 </div> -->
 <div class="nav-container" ><!-- :class="showNav ? 'active' : ''" -->
-	<div class="nofication-bell"  @click="forceRoute()">
+	<div class="nofication-bell" v-if="isLoggedIn" @click="forceRoute()">
 		<router-link to="/friends"><i class="far fa-bell cursor-pointer"> {{numRequests}}</i></router-link>
 	</div>
 	<h2>Shit To Do</h2>
@@ -26,7 +26,8 @@
   <router-view/>
   
 <notifications-panel></notifications-panel>
-<div class="list-nav" v-if="page!='Lists'">
+
+<div class="list-nav" v-if="page!='Lists'" @click="showNav=false">
 	<div>
 		<i class="fas fa-users fa-2x" @click="this.$router.push('/friends')"></i>
 	</div>
