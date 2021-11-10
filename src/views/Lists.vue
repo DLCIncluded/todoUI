@@ -654,6 +654,13 @@ export default {
 		},
 		async newTodo(){
 			var v = this;
+			if(v.newTodoName.trim() == ''){
+				v.$store.dispatch('addNotification',{
+					type: "error",
+					message: "Sorry you cannot submit a blank list item."
+				})
+				return;
+			}
 			await v.$store.dispatch('newTodo',{
 				list_id: v.currentListId,
 				type: v.newTodoType,

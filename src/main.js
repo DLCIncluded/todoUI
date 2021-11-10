@@ -9,7 +9,4 @@ import VEager from '@kuroski/v-eager'
 // axios.defaults.baseURL = 'http://localhost/api'
 axios.defaults.baseURL = process.env.VUE_APP_BASE_URL;
 
-
-
-
 createApp(App).use(store).use(router).use(VEager).mount('#app')
