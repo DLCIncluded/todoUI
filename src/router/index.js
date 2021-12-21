@@ -23,6 +23,24 @@ const routes = [
     component: () => import(/* webpackChunkName: "lists" */ '../views/Lists.vue')
   },
   {
+    path: '/list/:id',
+    name: 'List',
+	meta: {requiresAuth: true},
+    component: () => import(/* webpackChunkName: "list" */ '../views/List.vue')
+  },
+  {
+    path: '/editlist/:id',
+    name: 'EditList',
+	meta: {requiresAuth: true},
+    component: () => import(/* webpackChunkName: "editlist" */ '../views/EditList.vue')
+  },
+  {
+    path: '/newitem/:id',
+    name: 'NewItem',
+	meta: {requiresAuth: true},
+    component: () => import(/* webpackChunkName: "newitem" */ '../views/NewItem.vue')
+  },
+  {
     path: '/login',
     name: 'Login',
 	meta: {requiresUnAuth: true},

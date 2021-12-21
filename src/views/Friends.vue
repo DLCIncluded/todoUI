@@ -3,7 +3,7 @@
 		<div class="card-container friends-container">
 			<div class="card">
 				<div class="card-head" >
-					<h3>Friends</h3>
+					<h1>Manage Friends</h1>
 				</div>
 				<div class="card-body">		
 					Friends: 
@@ -92,9 +92,9 @@ export default {
 	},
 	methods: {
 		async refreshAll(){
-			this.getFriends();
-			this.getFriendRequests();
-			this.getPendingRequests();
+			await this.getFriends();
+			await this.getFriendRequests();
+			await this.getPendingRequests();
 		},
 		async checkUsername(friendReqUsername){
 			var v = this;
@@ -237,7 +237,7 @@ export default {
 						type: "success",
 						message: response.data.message
 					})
-					console.log(response.data);
+					// console.log(response.data);
 					// v.isLoading = false;
 				}
 				
@@ -266,7 +266,7 @@ export default {
 						type: "success",
 						message: response.data.message
 					})
-					console.log(response.data);
+					// console.log(response.data);
 					// v.isLoading = false;
 				}
 				
@@ -295,7 +295,7 @@ export default {
 						type: "success",
 						message: response.data.message
 					})
-					console.log(response.data);
+					// console.log(response.data);
 					// v.isLoading = false;
 				}
 				

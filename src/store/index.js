@@ -161,6 +161,10 @@ export default createStore({
 			// console.log(response.data.lists)
 			if(response.data.error){
 				commit('setRequests',[]);
+				if(response.data.message == "Token Invalid") {
+					dispatch('logout');
+					return;
+				}
 				dispatch('addNotification', {
                     type: "error",
                     message: response.data.message
@@ -183,6 +187,10 @@ export default createStore({
 			// console.log(response.data.lists)
 			if(response.data.error){
 				commit('setPendingRequests',[]);
+				if(response.data.message == "Token Invalid") {
+					dispatch('logout');
+					return;
+				}
 				dispatch('addNotification', {
                     type: "error",
                     message: response.data.message
@@ -203,17 +211,22 @@ export default createStore({
 		var fd = new FormData();
 		fd.append('id', localStorage.id);
 		fd.append('token', localStorage.token);
-		// this.isLoading = true;
+		
 
 		await axios.post("server.php?action=getfriends",fd).then(function(response){
 			// console.log(response.data.lists)
 			if(response.data.error){
 				commit('setFriends',null);
+				if(response.data.message == "Token Invalid") {
+					dispatch('logout');
+					return;
+				}
 				dispatch('addNotification', {
                     type: "error",
                     message: response.data.message
                 })		
 			}else{
+				// console.log(response.data)
 				commit('setFriends',response.data.friends);
 			}
 		})
@@ -291,7 +304,7 @@ export default createStore({
                     // dispatch('logout', {type: 'error', msg: 'Session Invalid, please login again.'});
 					dispatch('logout');
                     // commit('changeCheckingAuth', false)
-					dispatch('addNotification');
+					// dispatch('addNotification');
                 }else{
                     console.log("token valid");
                     // console.log(response.data)                        

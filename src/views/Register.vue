@@ -139,8 +139,6 @@ export default {
 			}).then(()=>{
 				v.isLoading = false;
 			})
-
-			
 		},
 		async resetPassword(){
 			var v = this;

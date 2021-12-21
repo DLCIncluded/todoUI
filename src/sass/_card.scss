@@ -1,5 +1,4 @@
 .card-container {
-	position: absolute;
 	width: 100%;
 	padding-bottom: 5em;
 	padding-left: auto;
@@ -7,17 +6,13 @@
 }
 
 .card {
-	width: 98%;
+	width: 100%;
 	// left:.6em;
 	position: relative;
 	margin-left: auto;
 	margin-right: auto;
-
-	
-	background-color: $card-body-color;
 	color: $high-emphasis;
 
-	border-radius: .5em;
 	transition: all .35s ease;
 
 	.friends {
@@ -36,18 +31,24 @@
 	.friend-item {
 		cursor:pointer;
 	}
+
+	.control-buttons {
+		position: relative;
+		display: flex;
+		justify-content:space-evenly;
+		flex-direction: column;
+		padding:.05em;
+		flex-shrink: 0;
+	}
 	
 
 	&-head {
-		// display:flex;
+		display:flex;
 		// align-items: flex-end;
-		// justify-content: space-between;
+		justify-content: space-between;
 
-		background-color: $card-head-color;
-		padding: 1em;
+		padding: 0 1em;
 
-		border-top-left-radius: .5em;
-		border-top-right-radius: .5em;
 		&>h2 {
 			line-height: 1;
 		}
@@ -59,6 +60,7 @@
 		
 		
 	}
+
 	.create-new-btn {
 		margin-top:auto;
 		margin-bottom: auto;
@@ -66,6 +68,7 @@
 		color:$color-primary;	
 		cursor: pointer;	
 	}
+	
 	.edit-button {
 		margin-top:auto;
 		margin-bottom: auto;
@@ -75,16 +78,13 @@
 	}
 
 	.back-button {
-		// position: absolute;
-		// left: -.25em;
-		// top: -.25em;
 		margin-top:auto;
 		margin-bottom: auto;
 		cursor: pointer;
 	}
 
 	&-body {
-		padding: .5em;
+		// padding: .5em;
 		transition: all .35s ease;
 		position: relative;
 	}
@@ -92,33 +92,43 @@
 	.list-item {
 		z-index: 1;
 		transition: all linear .2s;
-		background-color: $card-item-color;
-		margin-bottom: .3em;
+		// background-color: $card-item-color;
+		border-bottom: 1px solid $color-primary;
+
+		
 		padding-left: .5em;
 		padding-right: .5em;
-		box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.1);
-		border-radius: 5px;
+		// padding-top:.1em;
+		// padding-bottom: .5em;
+		// box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.1);
+		// border-radius: 5px;
 		font-size: 1.5em;
-		&>div{
+
+		&:nth-child(1){
+			border-top: 1px solid $color-primary;
+			// padding-top: .3em;
+		}
+		&>.list-info {
+			&>.list-text-large {
+				line-height: 1.1;
+			}
+			&>.list-text-small {
+				
+				line-height: 1;
+				font-size: .6em;
+			}
+		}
+		
+
+		&>.list-controls{
 			display: flex;
 		}
 
-		&:hover {
-			box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
-			transform: translate(-1px,-1px);
-		}
+		// &:hover {
+		// 	box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+		// 	transform: translate(-1px,-1px);
+		// }
 	}
-
-	
-	// .slide-in-right {
-
-	// }
-
-	// .overlay {
-	// 	&-box {
-
-	// 	}
-	// }
 
 	
 }

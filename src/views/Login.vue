@@ -12,20 +12,18 @@
 				</div>
 				<form @submit.prevent="login()">
 					<div class="input-group">
-						<!-- <h3>Username</h3>  -->
+						<h3>Username</h3> 
 						<input type="text" name="username" v-model="username" placeholder="Username"/>
 					</div>
 					<div class="input-group">
-						<!-- <h3>Password</h3>  -->
+						<h3>Password</h3> 
 						<input type="password" v-model="password" name="password" placeholder="Password"/>
 					</div>
 					<div class="input-group">
-						<!-- <h3>Password</h3>  -->
 						<button type="submit" name="submit">Login</button>
 					</div>
 				</form>
 				<div class="input-group">
-					<!-- <h3>Password</h3>  -->
 					<a href="#" @click.prevent="requestReset()">Forgot Password?</a> - Have a code? <a href="#" @click.prevent="resetPasswordForm = !resetPasswordForm">Reset Password</a> - <router-link to="/register">Register</router-link>
 				</div>
 			</div>
@@ -64,7 +62,6 @@
 					</div>
 				</form>
 				<div class="input-group">
-					<!-- <h3>Password</h3>  -->
 					<a href="#" @click.prevent="resetPasswordForm = false">Cancel</a>
 				</div>
 			</div>
@@ -176,9 +173,7 @@ export default {
 			fd.append('new_password', v.newPassword);
 			this.isLoading = true;
 
-			await axios.post("server.php?action=resetpassword",fd).then(function(response){
-				// console.log(response.data.lists)
-				
+			await axios.post("server.php?action=resetpassword",fd).then(function(response){				
 				if(response.data.error){
 					v.$store.dispatch('addNotification', {
 						type: "error",
